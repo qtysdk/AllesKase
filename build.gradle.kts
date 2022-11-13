@@ -33,3 +33,10 @@ tasks.test {
     // report is always generated after tests run
     finalizedBy(tasks.getByName("jacocoTestReport"))
 }
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required.set(true)
+    }
+}
+
