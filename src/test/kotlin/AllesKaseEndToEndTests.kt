@@ -27,9 +27,16 @@ class AllesKaseEndToEndTests : BaseEndToEndTests() {
         givenPlayerWithKeptCards(PLAYER_2, Card(5, CardType.CHEESE), Card(1, CardType.CHEESE))
 
         val gameId = givenGameWithPlayers(PLAYER_1, PLAYER_2)
+        givenGameWithEmptyProvidingDeck(gameId)
         whenStartTheGame(gameId, PLAYER_1)
 
         thenGameHasEndedAndTheWinnerGotHigherScores(gameId)
+    }
+
+    private fun givenGameWithEmptyProvidingDeck(gameId: String) {
+        database.gameMap[gameId]!!.providingDeck.apply {
+            cards.clear()
+        }
     }
 
     private fun thenGameHasEndedAndTheWinnerGotHigherScores(gameId: String) {

@@ -12,6 +12,7 @@ abstract class BaseEndToEndTests {
     val joinGameUseCase: JoinGameUseCase = JoinGameUseCaseImpl(database)
     val startGameUseCase: StartGameUseCase = StartGameUseCaseImpl(database)
     val queryGameStatus = QueryGameStatus(database)
+
     protected fun givenPlayerWithKeptCards(playerId: String, vararg cards: Card) {
         cards.forEach {
             database.playerMap[playerId]!!.keepCard(it)
