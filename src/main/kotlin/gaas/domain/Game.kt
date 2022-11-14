@@ -1,8 +1,5 @@
 package gaas.domain
 
-import java.util.Collections
-import java.util.Comparator
-import java.util.StringJoiner
 import kotlin.streams.toList
 
 class Game {
@@ -11,6 +8,7 @@ class Game {
     lateinit var id: String
     val players = mutableListOf<Player>()
     val events = mutableListOf<String>()
+    val providingDeck = Deck()
 
 
     fun join(player: Player) {
@@ -42,5 +40,19 @@ class Game {
     private fun announceScores() {
         val scoreList = players.stream().map { it -> "${it.id} got ${it.scores()} scores" }.toList()
         this.addEvent(scoreList.joinToString(", "))
+    }
+
+    fun closeGameByEmptyProvidingDeckRule(): Boolean {
+        if (!providingDeck.isEmpty()) {
+            return false
+        }
+
+        this.addEvent("game has ended")
+
+        val sortingPlayers = mutableListOf<Player>().apply { addAll(players) }
+        sortingPlayers.sortBy { it.scores() }
+        this.addEvent("${sortingPlayers.last().id} won")
+        this.announceScores()
+        return true
     }
 }

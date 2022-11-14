@@ -19,10 +19,10 @@ class StartGameUseCaseImpl(private val database: Database) : StartGameUseCase {
             return
         }
 
-        // TODO case 2
+        if (game.closeGameByEmptyProvidingDeckRule()) {
+            return
+        }
 
-        // otherwise, make the first player actionable
-        game.addEvent("player-? act")
         return
     }
 
