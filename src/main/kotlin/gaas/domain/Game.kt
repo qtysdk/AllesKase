@@ -8,7 +8,12 @@ class Game {
     lateinit var id: String
     val players = mutableListOf<Player>()
     val events = mutableListOf<String>()
+
+    val demoZone = DemoZone()
     val providingDeck = Deck()
+
+    var turn: Turn = BEFORE_THE_FIRST_TURN
+    val dice = Dice()
 
 
     fun join(player: Player) {
@@ -54,5 +59,35 @@ class Game {
         this.addEvent("${sortingPlayers.last().id} won")
         this.announceScores()
         return true
+    }
+
+    fun nextTurnPlayer() {
+        if (closeGameByOnlyOnePlayerAliveRule()) {
+            return
+        }
+
+        if (closeGameByEmptyProvidingDeckRule()) {
+            return
+        }
+
+        this.addEvent(this.demoZone.asEvent())
+        // TODO pick the "first" next player
+        if (turn == BEFORE_THE_FIRST_TURN) {
+            // it is time for pick the first player
+            val player = players[0]
+            turn = Turn(player, dice.roll(), listOf("PEEP"))
+            addEvent("turn-player: ${player.id}")
+            return
+        }
+
+        var next = players.indexOf(turn.player) + 1
+        if (next >= players.size) {
+            next = 0
+        }
+
+        val player = players[next]
+        turn = Turn(player, dice.roll(), listOf("PEEP"))
+        addEvent("turn-player: ${player.id}")
+        return
     }
 }

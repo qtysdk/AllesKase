@@ -23,6 +23,8 @@ class StartGameUseCaseImpl(private val database: Database) : StartGameUseCase {
             return
         }
 
+        game.nextTurnPlayer()
+
         return
     }
 

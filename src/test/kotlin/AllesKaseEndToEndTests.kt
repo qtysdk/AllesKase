@@ -1,23 +1,11 @@
 import gaas.domain.Card
 import gaas.domain.CardType
 import gaas.domain.GameStatus
-import gaas.domain.Player
-import gaas.repository.Database
-import gaas.usecases.*
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
-private const val PLAYER_1 = "player-1"
-private const val PLAYER_2 = "player-2"
 
-class AllesKaseEndToEndTests {
-
-    private val database = Database()
-    private val createGameUseCase: CreateGameUseCase = CreateGameUseCaseImpl(database)
-    private val joinGameUseCase: JoinGameUseCase = JoinGameUseCaseImpl(database)
-    private val startGameUseCase: StartGameUseCase = StartGameUseCaseImpl(database)
-    private val queryGameStatus = QueryGameStatus(database)
+class AllesKaseEndToEndTests : BaseEndToEndTests() {
 
     @Test
     internal fun the_shortest_path_from_game_started_to_the_end_because_only_1_player_alive() {
@@ -39,14 +27,15 @@ class AllesKaseEndToEndTests {
         givenPlayerWithKeptCards(PLAYER_2, Card(5, CardType.CHEESE), Card(1, CardType.CHEESE))
 
         val gameId = givenGameWithPlayers(PLAYER_1, PLAYER_2)
+        givenGameWithEmptyProvidingDeck(gameId)
         whenStartTheGame(gameId, PLAYER_1)
 
         thenGameHasEndedAndTheWinnerGotHigherScores(gameId)
     }
 
-    private fun givenPlayerWithKeptCards(playerId: String, vararg cards: Card) {
-        cards.forEach {
-            database.playerMap[playerId]!!.keepCard(it)
+    private fun givenGameWithEmptyProvidingDeck(gameId: String) {
+        database.gameMap[gameId]!!.providingDeck.apply {
+            cards.clear()
         }
     }
 
@@ -66,28 +55,5 @@ class AllesKaseEndToEndTests {
         )
     }
 
-    private fun whenStartTheGame(gameId: String, playerId: String) {
-        startGameUseCase.start(gameId, playerId)
-    }
 
-    private fun givenGameWithPlayers(vararg playerIds: String): String {
-        val gameId = createGameUseCase.create(playerIds[0])
-        if (playerIds.size > 1) {
-            playerIds.toList().stream().skip(1).forEach {
-                assertTrue(joinGameUseCase.join(gameId, it))
-            }
-        }
-        return gameId
-    }
-
-
-    private fun givenPlayerWithId(playerId: String): Player {
-        val p = Player(playerId)
-        database.playerMap[playerId] = p
-        return p
-    }
-
-    private fun givenPlayerNotAliveStatus(s: String) {
-        database.playerMap[s]!!.alive = false
-    }
 }
