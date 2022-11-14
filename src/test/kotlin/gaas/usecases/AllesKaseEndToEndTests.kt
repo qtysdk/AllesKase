@@ -1,3 +1,5 @@
+package gaas.usecases
+
 import gaas.domain.Card
 import gaas.domain.CardType
 import gaas.domain.GameStatus

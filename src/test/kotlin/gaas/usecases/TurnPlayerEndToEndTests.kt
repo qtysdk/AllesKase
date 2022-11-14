@@ -1,8 +1,8 @@
+package gaas.usecases
+
 import gaas.domain.Card
 import gaas.domain.CardType
 import gaas.domain.GameStatus
-import gaas.usecases.PlayerActionUseCase
-import gaas.usecases.PlayerActionUseCaseImpl
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals

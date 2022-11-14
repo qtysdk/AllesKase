@@ -1,7 +1,8 @@
+package gaas.usecases
+
 import gaas.domain.Card
 import gaas.domain.Player
 import gaas.repository.Database
-import gaas.usecases.*
 import kotlin.test.assertTrue
 
 abstract class BaseEndToEndTests {
