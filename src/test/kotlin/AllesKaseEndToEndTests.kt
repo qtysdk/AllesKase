@@ -1,11 +1,10 @@
+import gaas.domain.Card
+import gaas.domain.CardType
 import gaas.domain.GameStatus
 import gaas.domain.Player
 import gaas.repository.Database
 import gaas.usecases.*
 import org.junit.jupiter.api.Test
-import java.util.*
-import java.util.stream.Stream
-import kotlin.streams.toList
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -29,12 +28,42 @@ class AllesKaseEndToEndTests {
         val gameId = givenGameWithPlayers(PLAYER_1, PLAYER_2)
         whenStartTheGame(gameId, PLAYER_1)
 
-        thenGameHasEndedAndPlayer2IsTheWinner(gameId, PLAYER_2)
+        thenGameHasEndedAndAlivePlayerIsTheWinner(gameId)
     }
 
-    private fun thenGameHasEndedAndPlayer2IsTheWinner(gameId: String, playerId: String) {
+    @Test
+    internal fun the_shortest_path_from_game_started_to_the_end_because_providing_deck_is_empty() {
+        givenPlayerWithId(PLAYER_1)
+        givenPlayerWithId(PLAYER_2)
+        givenPlayerWithKeptCards(PLAYER_1, Card(2, CardType.TRAP), Card(4, CardType.CHEESE))
+        givenPlayerWithKeptCards(PLAYER_2, Card(5, CardType.CHEESE), Card(1, CardType.CHEESE))
+
+        val gameId = givenGameWithPlayers(PLAYER_1, PLAYER_2)
+        whenStartTheGame(gameId, PLAYER_1)
+
+        thenGameHasEndedAndTheWinnerGotHigherScores(gameId)
+    }
+
+    private fun givenPlayerWithKeptCards(playerId: String, vararg cards: Card) {
+        cards.forEach {
+            database.playerMap[playerId]!!.keepCard(it)
+        }
+    }
+
+    private fun thenGameHasEndedAndTheWinnerGotHigherScores(gameId: String) {
         val gameStatus: GameStatus = queryGameStatus.query(gameId)
-        assertEquals(listOf("game has ended", "$playerId won"), gameStatus.events(2))
+        assertEquals(
+            listOf("game has ended", "$PLAYER_2 won", "$PLAYER_1 got 4 scores, $PLAYER_2 got 6 scores"),
+            gameStatus.events(3)
+        )
+    }
+
+    private fun thenGameHasEndedAndAlivePlayerIsTheWinner(gameId: String) {
+        val gameStatus: GameStatus = queryGameStatus.query(gameId)
+        assertEquals(
+            listOf("game has ended", "$PLAYER_2 won", "$PLAYER_1 got 0 scores, $PLAYER_2 got 0 scores"),
+            gameStatus.events(3)
+        )
     }
 
     private fun whenStartTheGame(gameId: String, playerId: String) {
