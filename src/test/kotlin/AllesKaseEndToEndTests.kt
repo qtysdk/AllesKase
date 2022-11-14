@@ -27,7 +27,7 @@ class AllesKaseEndToEndTests {
 
         val gameId = givenGameWithPlayers(PLAYER_1, PLAYER_2)
         whenStartTheGame(gameId, PLAYER_1)
-        
+
         thenGameHasEndedAndAlivePlayerIsTheWinner(gameId)
     }
 
@@ -61,8 +61,8 @@ class AllesKaseEndToEndTests {
     private fun thenGameHasEndedAndAlivePlayerIsTheWinner(gameId: String) {
         val gameStatus: GameStatus = queryGameStatus.query(gameId)
         assertEquals(
-            listOf("game has ended", "$PLAYER_2 won", "$PLAYER_2 got 0 scores, $PLAYER_1 got 0 scores"),
-            gameStatus.events(2)
+            listOf("game has ended", "$PLAYER_2 won", "$PLAYER_1 got 0 scores, $PLAYER_2 got 0 scores"),
+            gameStatus.events(3)
         )
     }
 

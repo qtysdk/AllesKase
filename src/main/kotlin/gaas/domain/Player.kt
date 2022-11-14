@@ -9,4 +9,13 @@ class Player(val id: String) {
         this.keptCards.add(card)
     }
 
+    fun scores(): Int {
+        if (!alive) {
+            return 0
+        }
+        return keptCards.filter {
+            it.type == CardType.CHEESE
+        }.sumOf { it.value }
+    }
+
 }

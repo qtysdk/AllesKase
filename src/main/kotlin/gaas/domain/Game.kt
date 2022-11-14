@@ -1,6 +1,9 @@
 package gaas.domain
 
+import java.util.Collections
+import java.util.Comparator
 import java.util.StringJoiner
+import kotlin.streams.toList
 
 class Game {
 
@@ -20,7 +23,24 @@ class Game {
         this.events.add(evet)
     }
 
-    fun canEndByOnlyOnePlayerAlive(): Boolean {
-        return players.stream().filter { p -> p.alive }.count() == 1L
+    fun closeGameByOnlyOnePlayerAliveRule(): Boolean {
+        if (players.stream().filter { p -> p.alive }.count() > 1L) {
+            return false
+        }
+        this.players.forEach { winner ->
+            if (winner.alive) {
+                this.addEvent("game has ended")
+                this.addEvent("${winner.id} won")
+                this.announceScores()
+            }
+        }
+
+
+        return true
+    }
+
+    private fun announceScores() {
+        val scoreList = players.stream().map { it -> "${it.id} got ${it.scores()} scores" }.toList()
+        this.addEvent(scoreList.joinToString(", "))
     }
 }
