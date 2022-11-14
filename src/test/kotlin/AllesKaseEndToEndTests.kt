@@ -27,8 +27,8 @@ class AllesKaseEndToEndTests {
 
         val gameId = givenGameWithPlayers(PLAYER_1, PLAYER_2)
         whenStartTheGame(gameId, PLAYER_1)
-
-        thenGameHasEndedAndPlayerIsTheWinner(gameId, PLAYER_2)
+        
+        thenGameHasEndedAndAlivePlayerIsTheWinner(gameId)
     }
 
     @Test
@@ -41,7 +41,7 @@ class AllesKaseEndToEndTests {
         val gameId = givenGameWithPlayers(PLAYER_1, PLAYER_2)
         whenStartTheGame(gameId, PLAYER_1)
 
-        thenGameHasEndedAndPlayerIsTheWinnerByHigherScores(gameId, PLAYER_2)
+        thenGameHasEndedAndTheWinnerGotHigherScores(gameId)
     }
 
     private fun givenPlayerWithKeptCards(playerId: String, vararg cards: Card) {
@@ -50,13 +50,20 @@ class AllesKaseEndToEndTests {
         }
     }
 
-    private fun thenGameHasEndedAndPlayerIsTheWinnerByHigherScores(gameId: String, playerId: String) {
-        TODO("Not yet implemented")
+    private fun thenGameHasEndedAndTheWinnerGotHigherScores(gameId: String) {
+        val gameStatus: GameStatus = queryGameStatus.query(gameId)
+        assertEquals(
+            listOf("game has ended", "$PLAYER_2 won", "$PLAYER_2 got 6 scores, $PLAYER_1 got 4 scores"),
+            gameStatus.events(3)
+        )
     }
 
-    private fun thenGameHasEndedAndPlayerIsTheWinner(gameId: String, playerId: String) {
+    private fun thenGameHasEndedAndAlivePlayerIsTheWinner(gameId: String) {
         val gameStatus: GameStatus = queryGameStatus.query(gameId)
-        assertEquals(listOf("game has ended", "$playerId won"), gameStatus.events(2))
+        assertEquals(
+            listOf("game has ended", "$PLAYER_2 won", "$PLAYER_2 got 0 scores, $PLAYER_1 got 0 scores"),
+            gameStatus.events(2)
+        )
     }
 
     private fun whenStartTheGame(gameId: String, playerId: String) {
