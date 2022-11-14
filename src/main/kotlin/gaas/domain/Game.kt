@@ -62,12 +62,32 @@ class Game {
     }
 
     fun nextTurnPlayer() {
+        if (closeGameByOnlyOnePlayerAliveRule()) {
+            return
+        }
+
+        if (closeGameByEmptyProvidingDeckRule()) {
+            return
+        }
+
         this.addEvent(this.demoZone.asEvent())
-        // TODO pick the next player
+        // TODO pick the "first" next player
         if (turn == BEFORE_THE_FIRST_TURN) {
             // it is time for pick the first player
-            turn = Turn(players[0], dice.roll(), listOf("PEEP"))
-            addEvent("turn-player: ${players[0].id}")
+            val player = players[0]
+            turn = Turn(player, dice.roll(), listOf("PEEP"))
+            addEvent("turn-player: ${player.id}")
+            return
         }
+
+        var next = players.indexOf(turn.player) + 1
+        if (next >= players.size) {
+            next = 0
+        }
+
+        val player = players[next]
+        turn = Turn(player, dice.roll(), listOf("PEEP"))
+        addEvent("turn-player: ${player.id}")
+        return
     }
 }

@@ -5,6 +5,7 @@ import kotlin.streams.toList
 
 class GameStatus {
 
+    var turn: Turn = BEFORE_THE_FIRST_TURN
     var events = listOf<String>()
 
     fun events(lastEvents: Int): List<String> {
@@ -14,6 +15,7 @@ class GameStatus {
 
     fun refreshGameStatus(game: Game) {
         this.events = Collections.unmodifiableList(game.events)
+        this.turn = game.turn
     }
 
 }

@@ -1,11 +1,15 @@
 import gaas.domain.Card
 import gaas.domain.CardType
 import gaas.domain.GameStatus
+import gaas.usecases.PlayerActionUseCase
+import gaas.usecases.PlayerActionUseCaseImpl
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 
 class TurnPlayerEndToEndTests : BaseEndToEndTests() {
 
+    val playerActionUseCase: PlayerActionUseCase = PlayerActionUseCaseImpl(database)
 
     @Test
     internal fun turn_player_will_know_dice_value_and_action_list() {
@@ -16,15 +20,36 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
         val gameId = givenGameWithPlayers(PLAYER_1, PLAYER_2)
         givenDemoZoneWithCards_1C_1T_5T_5C_6T_6T(gameId)
         whenStartTheGame(gameId, PLAYER_1)
-        
+
         // TODO the first player is always the game host, we should pick the first randomly.
         thenTheFirstPlayerGetDiceValue_3_And_ActionListOnlyHasPeepCard(gameId)
         thenAllPlayerKnowsPublicInformationByEvents(gameId)
+
+        whenWrongPlayerDoActionThenGotException(gameId)
+        whenTurnPlayerDoActionThenSwitchToTheNextPlayer(gameId)
+
+    }
+
+    private fun whenTurnPlayerDoActionThenSwitchToTheNextPlayer(gameId: String) {
+        playerActionUseCase.doAction(gameId, PLAYER_1, "PEEP", 0)
+        // player 1 got the private message for peep the card
+        assertEquals(database.playerMap[PLAYER_1]!!.privateMessages(), listOf("peep, index:0, card: 1C"))
+
+        // player changed
+        val gameStatus: GameStatus = queryGameStatus.query(gameId)
+        assertEquals(gameStatus.turn.player.id, PLAYER_2)
+
+    }
+
+    private fun whenWrongPlayerDoActionThenGotException(gameId: String) {
+        assertThrows<RuntimeException> {
+            playerActionUseCase.doAction(gameId, PLAYER_2, "WHATEVER_ACTION", 0)
+        }
+
     }
 
     private fun thenAllPlayerKnowsPublicInformationByEvents(gameId: String) {
         val gameStatus: GameStatus = queryGameStatus.query(gameId)
-        println(gameStatus.events)
         assertEquals(
             listOf("demo-zone: 1C_1T_5T_5C_6T_6T", "turn-player: $PLAYER_1"),
             gameStatus.events(2)
