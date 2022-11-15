@@ -1,8 +1,10 @@
 package gaas.usecases
 
 import gaas.common.Events
+import gaas.common.GameInitializer
 import gaas.domain.Card
 import gaas.domain.CardType
+import gaas.domain.Game
 import gaas.domain.GameStatus
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -37,8 +39,10 @@ class AllesKaseEndToEndTests : BaseEndToEndTests() {
     }
 
     private fun givenGameWithEmptyProvidingDeck(gameId: String) {
-        database.gameMap[gameId]!!.providingDeck.apply {
-            cards.clear()
+        database.findGameById(gameId)!!.cardsInitializer = object : GameInitializer {
+            override fun resetCards(game: Game) {
+                // do nothing, we expect an empty deck here
+            }
         }
     }
 

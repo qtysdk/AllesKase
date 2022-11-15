@@ -1,18 +1,38 @@
 package gaas.usecases
 
-import gaas.common.Events
+import gaas.common.*
 import gaas.repository.Database
 
 interface StartGameUseCase {
+
     abstract fun start(gameId: String, playerId: String)
+
 
 }
 
 class StartGameUseCaseImpl(private val database: Database) : StartGameUseCase {
     override fun start(gameId: String, playerId: String) {
-        // TODO check player own this game
-        // send started event
-        val game = database.findGameById(gameId)
+        val game = database.findGameById(gameId) ?: throw GameDoesNotExistException
+
+        if (game.events.any { it.message == Events.GAME_STARTED.message }) {
+            throw GameHasStartedException
+        }
+
+        if (game.events.any { it.message == Events.GAME_ENDED.message }) {
+            throw GameHasFinishedException
+        }
+
+        val hostPlayer = database.findPlayerById(playerId)
+        if (game.host != hostPlayer) {
+            throw CannotStartGameByNonHostPlayerException
+        }
+
+        if (game.players.size < 2) {
+            throw CannotStartGameWithTooFewPlayersException
+        }
+
+        game.resetDecksAndDemoZone()
+
         game.postEvent(Events.GAME_STARTED)
 
 
@@ -28,6 +48,7 @@ class StartGameUseCaseImpl(private val database: Database) : StartGameUseCase {
 
         return
     }
+
 
 }
 

@@ -12,6 +12,7 @@ class CreateGameUseCaseImpl(private val database: Database) : CreateGameUseCase 
     override fun create(playerId: String): String {
         val game = Game()
         val player = database.findPlayerById(playerId)
+        game.host = player!!
         game.join(player!!)
         return database.save(game).id
     }

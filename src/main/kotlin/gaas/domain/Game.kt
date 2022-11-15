@@ -1,23 +1,29 @@
 package gaas.domain
 
-import gaas.common.Event
-import gaas.common.Events
+import gaas.common.*
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import kotlin.streams.toList
 
 class Game {
 
-    val logger = LoggerFactory.getLogger("Game")
+
+    private val logger: Logger = LoggerFactory.getLogger("Game")
 
     lateinit var id: String
+    lateinit var host: Player
+
     val players = mutableListOf<Player>()
     val events = mutableListOf<Event>()
 
     val demoZone = DemoZone()
     val providingDeck = Deck()
+    val droppedDeck = Deck()
 
     var turn: Turn = BEFORE_THE_FIRST_TURN
     val dice = Dice()
+    var cardsInitializer: GameInitializer = DefaultGameInitializer()
+    var firstPlayerChooser: FirstPlayerChooser = DefaultFirstPlayerChooser()
 
     init {
         logger.info("Game[$this] created")
@@ -80,10 +86,9 @@ class Game {
         }
 
         this.postEvent(Events.demoZone(this.demoZone.asEvent()))
-        // TODO pick the "first" next player
         if (turn == BEFORE_THE_FIRST_TURN) {
             // it is time for pick the first player
-            val player = players[0]
+            val player = firstPlayerChooser.pickTheFirstTurnPlayer(this)
             turn = Turn(player, dice.roll(), listOf("PEEP"))
             postEvent(Events.turnPlayer(player.id))
             return
@@ -99,4 +104,10 @@ class Game {
         postEvent(Events.turnPlayer(player.id))
         return
     }
+
+    fun resetDecksAndDemoZone() {
+        cardsInitializer.resetCards(this)
+    }
+
+
 }
