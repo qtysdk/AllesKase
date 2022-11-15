@@ -1,5 +1,6 @@
 package gaas.usecases
 
+import gaas.common.Events
 import gaas.repository.Database
 
 interface StartGameUseCase {
@@ -12,7 +13,7 @@ class StartGameUseCaseImpl(private val database: Database) : StartGameUseCase {
         // TODO check player own this game
         // send started event
         val game = database.findGameById(gameId)
-        game.addEvent("game has stated")
+        game.postEvent(Events.GAME_STARTED)
 
 
         if (game.closeGameByOnlyOnePlayerAliveRule()) {
