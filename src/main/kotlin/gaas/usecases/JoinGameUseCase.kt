@@ -10,7 +10,7 @@ interface JoinGameUseCase {
 
 class JoinGameUseCaseImpl(private val database: Database) : JoinGameUseCase {
     override fun join(gameId: String, playerId: String): Boolean {
-        val game: Game = database.findGameById(gameId)
+        val game: Game = database.findGameById(gameId)!!
 
         // TODO check player exists or do exception handleing
         game.join(database.findPlayerById(playerId)!!)

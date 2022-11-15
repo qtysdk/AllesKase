@@ -7,9 +7,12 @@ import kotlin.streams.toList
 
 class Game {
 
+
     val logger = LoggerFactory.getLogger("Game")
 
     lateinit var id: String
+    lateinit var host: Player
+
     val players = mutableListOf<Player>()
     val events = mutableListOf<Event>()
 
