@@ -1,5 +1,6 @@
 package gaas.usecases
 
+import gaas.common.Events
 import gaas.domain.Card
 import gaas.domain.CardType
 import gaas.domain.GameStatus
@@ -50,10 +51,10 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
 
     private fun thenAllPlayerKnowsPublicInformationByEvents(gameId: String) {
         val gameStatus: GameStatus = queryGameStatus.query(gameId)
-        assertEquals(
-            listOf("demo-zone: 1C_1T_5T_5C_6T_6T", "turn-player: $PLAYER_1"),
-            gameStatus.events(2)
-        )
+        var events = gameStatus.events(2)
+
+        assertEquals(Events.demoZone("demo-zone: 1C_1T_5T_5C_6T_6T"), events[0])
+        assertEquals(Events.turnPlayer(PLAYER_1), events[1])
     }
 
     private fun givenDemoZoneWithCards_1C_1T_5T_5C_6T_6T(gameId: String) {
