@@ -1,6 +1,8 @@
 package gaas.usecases
 
+import gaas.common.FirstPlayerChooser
 import gaas.domain.Card
+import gaas.domain.Game
 import gaas.domain.Player
 import gaas.repository.Database
 import kotlin.test.assertTrue
@@ -21,6 +23,15 @@ abstract class BaseEndToEndTests {
     }
 
     protected fun whenStartTheGame(gameId: String, playerId: String) {
+        val game = database.findGameById(gameId)
+        if (game != null) {
+            // we always pick up the first player for the first turn in testing
+            game.firstPlayerChooser = object : FirstPlayerChooser {
+                override fun pickTheFirstTurnPlayer(game: Game): Player {
+                    return game.players[0]
+                }
+            }
+        }
         startGameUseCase.start(gameId, playerId)
     }
 

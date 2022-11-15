@@ -30,4 +30,9 @@ class Player(val id: String) {
         this.privateMessage.add(message)
     }
 
+    override fun toString(): String {
+        return "Player(id='$id', alive=$alive, keptCards=$keptCards, privateMessage=$privateMessage)"
+    }
+
+
 }

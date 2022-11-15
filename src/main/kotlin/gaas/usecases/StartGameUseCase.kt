@@ -4,17 +4,15 @@ import gaas.common.*
 import gaas.repository.Database
 
 interface StartGameUseCase {
+
     abstract fun start(gameId: String, playerId: String)
+
 
 }
 
 class StartGameUseCaseImpl(private val database: Database) : StartGameUseCase {
     override fun start(gameId: String, playerId: String) {
-        val game = database.findGameById(gameId)
-
-        if (game == null) {
-            throw GameDoesNotExistException
-        }
+        val game = database.findGameById(gameId) ?: throw GameDoesNotExistException
 
         if (game.events.any { it.message == Events.GAME_STARTED.message }) {
             throw GameHasStartedException
@@ -33,6 +31,8 @@ class StartGameUseCaseImpl(private val database: Database) : StartGameUseCase {
             throw CannotStartGameWithTooFewPlayersException
         }
 
+        game.resetDecksAndDemoZone()
+
         game.postEvent(Events.GAME_STARTED)
 
 
@@ -48,6 +48,7 @@ class StartGameUseCaseImpl(private val database: Database) : StartGameUseCase {
 
         return
     }
+
 
 }
 

@@ -1,8 +1,11 @@
 package gaas.usecases
 
+import gaas.common.DefaultGameInitializer
 import gaas.common.Events
+import gaas.common.GameInitializer
 import gaas.domain.Card
 import gaas.domain.CardType
+import gaas.domain.Game
 import gaas.domain.GameStatus
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -58,17 +61,26 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
     }
 
     private fun givenDemoZoneWithCards_1C_1T_5T_5C_6T_6T(gameId: String) {
-        database.gameMap[gameId]!!.demoZone.apply {
-            // whatever in the demo zone, we want to reset it and add new cards
-            cards.clear()
+        database.findGameById(gameId)!!.cardsInitializer = object : GameInitializer {
+            override fun resetCards(game: Game) {
+                game.demoZone.apply {
 
-            add(Card(1, CardType.CHEESE))
-            add(Card(1, CardType.TRAP))
-            add(Card(5, CardType.TRAP))
-            add(Card(5, CardType.CHEESE))
-            add(Card(6, CardType.TRAP))
-            add(Card(6, CardType.TRAP))
+                    // invoke the origin initializer to avoid the game becoming ended.
+                    DefaultGameInitializer().resetCards(game)
+
+                    // whatever in the demo zone, we want to reset it and add new cards
+                    cards.clear()
+
+                    add(Card(1, CardType.CHEESE))
+                    add(Card(1, CardType.TRAP))
+                    add(Card(5, CardType.TRAP))
+                    add(Card(5, CardType.CHEESE))
+                    add(Card(6, CardType.TRAP))
+                    add(Card(6, CardType.TRAP))
+                }
+            }
         }
+
     }
 
     private fun thenTheFirstPlayerGetDiceValue_3_And_ActionListOnlyHasPeepCard(gameId: String) {
