@@ -7,7 +7,7 @@ import kotlin.streams.toList
 
 class Game {
 
-    val logger = LoggerFactory.getLogger(Game::javaClass.name)
+    val logger = LoggerFactory.getLogger("Game")
 
     lateinit var id: String
     val players = mutableListOf<Player>()
