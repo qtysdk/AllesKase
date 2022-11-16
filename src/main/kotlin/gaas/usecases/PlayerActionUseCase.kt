@@ -1,6 +1,10 @@
 package gaas.usecases
 
 import gaas.common.Events
+import gaas.common.InvalidCardIndexException
+import gaas.common.InvalidPlayerActionException
+import gaas.common.InvalidTurnPlayerException
+import gaas.domain.Game
 import gaas.domain.PlayerAction
 import gaas.repository.Database
 
@@ -16,8 +20,11 @@ class PlayerActionUseCaseImpl(val database: Database) : PlayerActionUseCase {
         val game = database.gameMap[gameId]!!
         val turn = game.turn
         if (turn.player.id != playerId) {
-            throw RuntimeException("PLEASE WAIT FOR YOUR TURN")
+            throw InvalidTurnPlayerException
         }
+
+        validateActionRequest(game, action)
+        validateCardIndex(game, cardIndex)
 
         val cardAtDemoZone = game.demoZone[cardIndex]!!
 
@@ -39,5 +46,22 @@ class PlayerActionUseCaseImpl(val database: Database) : PlayerActionUseCase {
 
         // request the next player
         game.nextTurnPlayer()
+    }
+
+    private fun validateCardIndex(game: Game, cardIndex: Int) {
+        if (!game.turn.actionIndex.contains(cardIndex)) {
+            throw InvalidCardIndexException
+        }
+    }
+
+    private fun validateActionRequest(game: Game, action: String) {
+        try {
+            if (game.turn.actionList.any { it == PlayerAction.valueOf(action) }) {
+                return
+            }
+        } catch (ignored: Exception) {
+            // failed by PlayerAction.valueOf
+        }
+        throw InvalidPlayerActionException
     }
 }
