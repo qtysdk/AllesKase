@@ -1,11 +1,9 @@
 package gaas.usecases
 
 import gaas.common.Events
+import gaas.domain.PlayerAction
 import gaas.repository.Database
 
-enum class PlayerAction {
-    PEEP, KEEP, DROP
-}
 
 interface PlayerActionUseCase {
     fun doAction(gameId: String, playerId: String, action: String, cardIndex: Int)
@@ -21,7 +19,7 @@ class PlayerActionUseCaseImpl(val database: Database) : PlayerActionUseCase {
             throw RuntimeException("PLEASE WAIT FOR YOUR TURN")
         }
 
-        val cardAtDemoZone = game.demoZone.cards[cardIndex]!!
+        val cardAtDemoZone = game.demoZone[cardIndex]!!
 
         if (action == PlayerAction.PEEP.name) {
             turn.player.addPrivateMessage("peep, index:$cardIndex, card: ${cardAtDemoZone.value}${cardAtDemoZone.type.name[0]}")
@@ -29,14 +27,14 @@ class PlayerActionUseCaseImpl(val database: Database) : PlayerActionUseCase {
 
         if (action == PlayerAction.KEEP.name) {
             turn.player.keepCard(cardAtDemoZone)
-            game.demoZone.replaceCart(cardIndex, game.providingDeck.deal())
+            game.demoZone.replaceCardAt(cardIndex, game.providingDeck.deal())
             game.postEvent(Events.playerKeepCard(turn.player.id, cardAtDemoZone))
         }
 
         if (action == PlayerAction.DROP.name) {
-            game.demoZone.replaceCart(cardIndex, game.providingDeck.deal())
+            game.demoZone.replaceCardAt(cardIndex, game.providingDeck.deal())
             game.postEvent(Events.playerDropCard(turn.player.id, cardIndex))
-            game.droppedDeck.cards.add(cardAtDemoZone)
+            game.droppedDeck.add(cardAtDemoZone)
         }
 
         // request the next player

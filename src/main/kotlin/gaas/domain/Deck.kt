@@ -14,7 +14,11 @@ private val cardSpec = listOf(
 
 open class Deck {
 
-    val cards = mutableListOf<Card>()
+    protected val cards = mutableListOf<Card>()
+
+    fun add(card: Card) {
+        cards.add(card)
+    }
 
     fun isEmpty(): Boolean {
         return cards.isEmpty()
@@ -46,6 +50,37 @@ open class Deck {
             // no cards here
             return Card(-1, CardType.CHEESE)
         }
+    }
+
+    fun selfValidateForProvidingDeck() {
+        assert(36 == cards.size)
+        assert(6 == cards.filter { it.value == 1 }.size)
+
+        assert(6 == cards.filter { it.value == 1 }.size)
+        assert(4 == cards.filter { it.value == 1 && it.type == CardType.CHEESE }.size)
+
+        assert(6 == cards.filter { it.value == 2 }.size)
+        assert(4 == cards.filter { it.value == 2 && it.type == CardType.CHEESE }.size)
+
+        assert(6 == cards.filter { it.value == 3 }.size)
+        assert(3 == cards.filter { it.value == 3 && it.type == CardType.CHEESE }.size)
+
+        assert(6 == cards.filter { it.value == 4 }.size)
+        assert(3 == cards.filter { it.value == 4 && it.type == CardType.CHEESE }.size)
+
+        assert(6 == cards.filter { it.value == 5 }.size)
+        assert(2 == cards.filter { it.value == 5 && it.type == CardType.CHEESE }.size)
+
+        assert(6 == cards.filter { it.value == 6 }.size)
+        assert(2 == cards.filter { it.value == 6 && it.type == CardType.CHEESE }.size)
+    }
+
+    fun last(): Card {
+        return cards.last()
+    }
+
+    fun clear() {
+        cards.clear()
     }
 
 

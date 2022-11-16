@@ -7,6 +7,7 @@ import gaas.domain.Card
 import gaas.domain.CardType
 import gaas.domain.Game
 import gaas.domain.GameStatus
+import gaas.domain.PlayerAction
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
@@ -69,7 +70,7 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
                     DefaultGameInitializer().resetCards(game)
 
                     // whatever in the demo zone, we want to reset it and add new cards
-                    cards.clear()
+                    game.demoZone.clear()
 
                     add(Card(1, CardType.CHEESE))
                     add(Card(1, CardType.TRAP))
@@ -89,6 +90,7 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
 
         assertEquals(game.turn.player, turnPlayer)
         assertEquals(3, game.turn.diceValue)
-        assertEquals(listOf("PEEP"), game.turn.actionList)
+        println(game.turn.actionList)
+        assertEquals(listOf(PlayerAction.PEEP), game.turn.actionList)
     }
 }
