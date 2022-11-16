@@ -29,12 +29,12 @@ class PlayerActionUseCaseImpl(val database: Database) : PlayerActionUseCase {
 
         if (action == PlayerAction.KEEP.name) {
             turn.player.keepCard(cardAtDemoZone)
-            game.demoZone.replaceCart(cardIndex, game.providingDeck.deal())
+            game.demoZone.replaceCardAt(cardIndex, game.providingDeck.deal())
             game.postEvent(Events.playerKeepCard(turn.player.id, cardAtDemoZone))
         }
 
         if (action == PlayerAction.DROP.name) {
-            game.demoZone.replaceCart(cardIndex, game.providingDeck.deal())
+            game.demoZone.replaceCardAt(cardIndex, game.providingDeck.deal())
             game.postEvent(Events.playerDropCard(turn.player.id, cardIndex))
             game.droppedDeck.add(cardAtDemoZone)
         }

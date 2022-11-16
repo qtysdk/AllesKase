@@ -17,7 +17,7 @@ class DemoZone : Deck() {
         return PlayerActions(listOf("KEEP", "DROP"), index)
     }
 
-    fun replaceCart(cardIndex: Int, card: Card) {
+    fun replaceCardAt(cardIndex: Int, card: Card) {
         cards[cardIndex] = card
     }
 
