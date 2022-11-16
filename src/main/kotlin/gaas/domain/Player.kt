@@ -1,12 +1,9 @@
 package gaas.domain
 
-import java.util.Collections
-import java.util.StringJoiner
-
 class Player(val id: String) {
     var alive: Boolean = true
 
-    private val keptCards = mutableListOf<Card>()
+    val keptCards = mutableListOf<Card>()
     private val privateMessage = mutableListOf<String>()
 
     fun keepCard(card: Card) {

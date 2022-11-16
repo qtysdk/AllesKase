@@ -1,5 +1,6 @@
 package gaas.common
 
+import gaas.domain.Card
 import java.time.LocalDateTime
 
 class Event(val message: String) {
@@ -43,6 +44,14 @@ class Events {
 
         fun demoZone(demoZoneState: String): Event {
             return Event(demoZoneState)
+        }
+
+        fun playerKeepCard(playerId: String, card: Card): Event {
+            return Event("player[$playerId], keep-card: $card")
+        }
+
+        fun playerDropCard(playerId: String, cardIndex: Int): Event {
+            return Event("player[$playerId], drop-card: $cardIndex")
         }
 
         val GAME_STARTED = Event("game has stated")

@@ -1,7 +1,5 @@
 package gaas.domain
 
-import java.util.Collections
-
 private data class CardSpec(val value: Int, val numbOfCheese: Int)
 
 private val cardSpec = listOf(
@@ -42,7 +40,12 @@ open class Deck {
     }
 
     fun deal(): Card {
-        return cards.removeLast()
+        try {
+            return cards.removeLast()
+        } catch (e: Exception) {
+            // no cards here
+            return Card(-1, CardType.CHEESE)
+        }
     }
 
 

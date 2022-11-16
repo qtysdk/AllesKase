@@ -31,8 +31,14 @@ abstract class BaseEndToEndTests {
                     return game.players[0]
                 }
             }
+            beforeGameStarted(game)
         }
+
         startGameUseCase.start(gameId, playerId)
+    }
+
+    fun beforeGameStarted(game: Game) {
+        // empty action
     }
 
     protected fun givenGameWithPlayers(vararg playerIds: String): String {
