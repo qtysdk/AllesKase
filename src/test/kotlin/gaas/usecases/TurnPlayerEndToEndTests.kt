@@ -69,7 +69,7 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
                     DefaultGameInitializer().resetCards(game)
 
                     // whatever in the demo zone, we want to reset it and add new cards
-                    cards.clear()
+                    game.demoZone.clear()
 
                     add(Card(1, CardType.CHEESE))
                     add(Card(1, CardType.TRAP))

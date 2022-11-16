@@ -21,7 +21,7 @@ class PlayerActionUseCaseImpl(val database: Database) : PlayerActionUseCase {
             throw RuntimeException("PLEASE WAIT FOR YOUR TURN")
         }
 
-        val cardAtDemoZone = game.demoZone.cards[cardIndex]!!
+        val cardAtDemoZone = game.demoZone[cardIndex]!!
 
         if (action == PlayerAction.PEEP.name) {
             turn.player.addPrivateMessage("peep, index:$cardIndex, card: ${cardAtDemoZone.value}${cardAtDemoZone.type.name[0]}")
@@ -36,7 +36,7 @@ class PlayerActionUseCaseImpl(val database: Database) : PlayerActionUseCase {
         if (action == PlayerAction.DROP.name) {
             game.demoZone.replaceCart(cardIndex, game.providingDeck.deal())
             game.postEvent(Events.playerDropCard(turn.player.id, cardIndex))
-            game.droppedDeck.cards.add(cardAtDemoZone)
+            game.droppedDeck.add(cardAtDemoZone)
         }
 
         // request the next player

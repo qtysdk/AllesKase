@@ -54,7 +54,7 @@ class PlayerActionUseCaseTests : BaseEndToEndTests() {
         assertEquals(CardType.CHEESE, keptCard.type)
 
         // then demo-zone refile 6T at index 1
-        val refilledCard = database.findGameById(gameId)!!.demoZone.cards[1]
+        val refilledCard = database.findGameById(gameId)!!.demoZone[1]
         assertEquals(6, refilledCard.value)
         assertEquals(CardType.TRAP, refilledCard.type)
     }
@@ -75,12 +75,12 @@ class PlayerActionUseCaseTests : BaseEndToEndTests() {
         playerActionUseCase.doAction(gameId, PLAYER_1, "DROP", 1)
 
         // then found the 2C at dropped deck
-        val keptCard = database.findGameById(gameId)!!.droppedDeck.cards[0]
+        val keptCard = database.findGameById(gameId)!!.droppedDeck.last()
         assertEquals(2, keptCard.value)
         assertEquals(CardType.CHEESE, keptCard.type)
 
         // then demo-zone refile 6T at index 1
-        val refilledCard = database.findGameById(gameId)!!.demoZone.cards[1]
+        val refilledCard = database.findGameById(gameId)!!.demoZone[1]
         assertEquals(6, refilledCard.value)
         assertEquals(CardType.TRAP, refilledCard.type)
     }
@@ -101,13 +101,13 @@ class PlayerActionUseCaseTests : BaseEndToEndTests() {
         game.cardsInitializer = object : GameInitializer {
             override fun resetCards(game: Game) {
                 // give 2 available cards in the providing deck
-                game.providingDeck.cards.clear()
-                game.providingDeck.cards.add(Card(6, CardType.TRAP))
-                game.providingDeck.cards.add(Card(6, CardType.TRAP))
+                game.providingDeck.clear()
+                game.providingDeck.add(Card(6, CardType.TRAP))
+                game.providingDeck.add(Card(6, CardType.TRAP))
 
 
                 // set demoZone cards all 1 point cheese
-                game.demoZone.cards.clear()
+                game.demoZone.clear()
 
                 game.demoZone.add(Card(1, CardType.CHEESE))
                 game.demoZone.add(Card(2, CardType.CHEESE))
