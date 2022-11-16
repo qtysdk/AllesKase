@@ -5,9 +5,12 @@ import gaas.common.Events
 import gaas.common.GameInitializer
 import gaas.domain.Card
 import gaas.domain.CardType
+import gaas.domain.Dice
 import gaas.domain.Game
 import gaas.domain.GameStatus
 import gaas.domain.PlayerAction
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
@@ -24,6 +27,8 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
 
         val gameId = givenGameWithPlayers(PLAYER_1, PLAYER_2)
         givenDemoZoneWithCards_1C_1T_5T_5C_6T_6T(gameId)
+
+        givenDiceAlwaysReturns3(gameId)
         whenStartTheGame(gameId, PLAYER_1)
 
         // TODO the first player is always the game host, we should pick the first randomly.
@@ -33,6 +38,12 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
         whenWrongPlayerDoActionThenGotException(gameId)
         whenTurnPlayerDoActionThenSwitchToTheNextPlayer(gameId)
 
+    }
+
+    private fun givenDiceAlwaysReturns3(gameId: String) {
+        val game = database.findGameById(gameId)!!
+        game.dice = mockk<Dice>()
+        every { game.dice.roll() } returns 3
     }
 
     private fun whenTurnPlayerDoActionThenSwitchToTheNextPlayer(gameId: String) {
@@ -87,6 +98,8 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
     private fun thenTheFirstPlayerGetDiceValue_3_And_ActionListOnlyHasPeepCard(gameId: String) {
         val game = database.gameMap[gameId]!!
         val turnPlayer = database.playerMap[PLAYER_1]!!
+
+
 
         assertEquals(game.turn.player, turnPlayer)
         assertEquals(3, game.turn.diceValue)

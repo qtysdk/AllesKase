@@ -1,5 +1,7 @@
 package gaas.domain
 
+import gaas.common.PlayerHasBeenDead
+
 enum class PlayerAction {
     PEEP, KEEP, DROP
 }
@@ -14,7 +16,14 @@ class Player(val id: String) {
     private val privateMessage = mutableListOf<String>()
 
     fun keepCard(card: Card) {
-        this.keptCards.add(card)
+        if (!alive) {
+            throw PlayerHasBeenDead
+        }
+
+        keptCards.add(card)
+        if (keptCards.filter { it.type == CardType.TRAP }.count() >= 3) {
+            alive = false
+        }
     }
 
     fun scores(): Int {
