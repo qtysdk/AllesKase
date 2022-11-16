@@ -1,6 +1,7 @@
 package gaas.usecases
 
 import gaas.common.GameInitializer
+import gaas.common.IllegalPlayerActionException
 import gaas.domain.Card
 import gaas.domain.CardType
 import gaas.domain.Dice
@@ -10,6 +11,7 @@ import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class PlayerActionUseCaseTests : BaseEndToEndTests() {
 
@@ -87,14 +89,51 @@ class PlayerActionUseCaseTests : BaseEndToEndTests() {
     }
 
 
+    @Test
+    internal fun test_player_does_invalid_action_or_card_index() {
+        givenPlayerWithId(PLAYER_1)
+        givenPlayerWithId(PLAYER_2)
+        val gameId = givenGameWithPlayers(PLAYER_1, PLAYER_2)
+
+        givenPresetDemoZone_1C2C3C1C5C2C_ProvidingDeck_6T6T_WithDiceValue(gameId, 2)
+        whenStartTheGame(gameId, PLAYER_1)
+
+        thenTurnPlayerWillBe(gameId, PLAYER_1)
+        thenActionCanDoWithPositions(gameId, listOf(PlayerAction.KEEP, PlayerAction.DROP), listOf(1, 5))
+
+        // when player do wrong action will get exception
+        val invalidActionException = assertFailsWith<IllegalPlayerActionException> {
+            playerActionUseCase.doAction(gameId, PLAYER_1, PlayerAction.PEEP.name, 1)
+        }
+        assertEquals("INVALID_PLAYER_ACTION", invalidActionException.message)
+
+        // when player do a non-existing action will get exception
+        val invalidActionNameException = assertFailsWith<IllegalPlayerActionException> {
+            playerActionUseCase.doAction(gameId, PLAYER_1, "no-such-action", 1)
+        }
+        assertEquals("INVALID_PLAYER_ACTION", invalidActionNameException.message)
+
+        // when player do action with a wrong card index will get exception
+        val invalidIndexException = assertFailsWith<IllegalPlayerActionException> {
+            playerActionUseCase.doAction(gameId, PLAYER_1, PlayerAction.DROP.name, 2)
+        }
+        assertEquals("INVALID_CARD_INDEX", invalidIndexException.message)
+
+        // when non turn-player do action will get exception
+        val wrongPlayerException = assertFailsWith<IllegalPlayerActionException> {
+            playerActionUseCase.doAction(gameId, PLAYER_2, PlayerAction.DROP.name, 5)
+        }
+        assertEquals("INVALID_TURN_PLAYER", wrongPlayerException.message)
+
+    }
+
+
     private fun thenTurnPlayerWillBe(gameId: String, playerId: String) {
         assertEquals(queryGameStatus.query(gameId).turn.player.id, playerId)
     }
 
     private fun thenActionCanDoWithPositions(
-        gameId: String,
-        actions: List<PlayerAction>,
-        actionablePosition: List<Int>
+        gameId: String, actions: List<PlayerAction>, actionablePosition: List<Int>
     ) {
         var s = queryGameStatus.query(gameId)
         assertEquals(actions, s.turn.actionList)
