@@ -1,5 +1,12 @@
 package gaas.domain
 
+enum class PlayerAction {
+    PEEP, KEEP, DROP
+}
+
+data class PlayerActions(val actions: List<PlayerAction>, val index: List<Int>)
+
+
 class Player(val id: String) {
     var alive: Boolean = true
 

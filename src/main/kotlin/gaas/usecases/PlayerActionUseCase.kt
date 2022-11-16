@@ -1,11 +1,9 @@
 package gaas.usecases
 
 import gaas.common.Events
+import gaas.domain.PlayerAction
 import gaas.repository.Database
 
-enum class PlayerAction {
-    PEEP, KEEP, DROP
-}
 
 interface PlayerActionUseCase {
     fun doAction(gameId: String, playerId: String, action: String, cardIndex: Int)

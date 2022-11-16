@@ -5,6 +5,7 @@ import gaas.domain.Card
 import gaas.domain.CardType
 import gaas.domain.Dice
 import gaas.domain.Game
+import gaas.domain.PlayerAction
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
@@ -24,7 +25,7 @@ class PlayerActionUseCaseTests : BaseEndToEndTests() {
         whenStartTheGame(gameId, PLAYER_1)
 
         thenTurnPlayerWillBe(gameId, PLAYER_1)
-        thenActionCanDoWithPositions(gameId, listOf("PEEP"), listOf(0, 1, 2, 3, 4, 5))
+        thenActionCanDoWithPositions(gameId, listOf(PlayerAction.PEEP), listOf(0, 1, 2, 3, 4, 5))
 
         // when player do "peep" to index  2 will get 3C
         playerActionUseCase.doAction(gameId, PLAYER_1, "PEEP", 2)
@@ -43,7 +44,7 @@ class PlayerActionUseCaseTests : BaseEndToEndTests() {
         whenStartTheGame(gameId, PLAYER_1)
 
         thenTurnPlayerWillBe(gameId, PLAYER_1)
-        thenActionCanDoWithPositions(gameId, listOf("KEEP", "DROP"), listOf(1, 5))
+        thenActionCanDoWithPositions(gameId, listOf(PlayerAction.KEEP, PlayerAction.DROP), listOf(1, 5))
 
         // when player do "keep" index 1 will have 2C in their own deck
         playerActionUseCase.doAction(gameId, PLAYER_1, "KEEP", 1)
@@ -69,9 +70,9 @@ class PlayerActionUseCaseTests : BaseEndToEndTests() {
         whenStartTheGame(gameId, PLAYER_1)
 
         thenTurnPlayerWillBe(gameId, PLAYER_1)
-        thenActionCanDoWithPositions(gameId, listOf("KEEP", "DROP"), listOf(1, 5))
+        thenActionCanDoWithPositions(gameId, listOf(PlayerAction.KEEP, PlayerAction.DROP), listOf(1, 5))
 
-        // when player do "keep" index 1 will have 2C in their own deck
+        // when player do "drop" index 1 will have 2C in their own deck
         playerActionUseCase.doAction(gameId, PLAYER_1, "DROP", 1)
 
         // then found the 2C at dropped deck
@@ -90,7 +91,11 @@ class PlayerActionUseCaseTests : BaseEndToEndTests() {
         assertEquals(queryGameStatus.query(gameId).turn.player.id, playerId)
     }
 
-    private fun thenActionCanDoWithPositions(gameId: String, actions: List<String>, actionablePosition: List<Int>) {
+    private fun thenActionCanDoWithPositions(
+        gameId: String,
+        actions: List<PlayerAction>,
+        actionablePosition: List<Int>
+    ) {
         var s = queryGameStatus.query(gameId)
         assertEquals(actions, s.turn.actionList)
         assertEquals(actionablePosition, s.turn.actionIndex)

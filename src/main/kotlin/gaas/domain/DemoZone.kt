@@ -11,10 +11,10 @@ class DemoZone : Deck() {
 
     fun createPlayerActions(diceValue: Int): PlayerActions {
         if (!cards.any { card -> card.value == diceValue }) {
-            return PlayerActions(listOf("PEEP"), (0 until cards.size).toList())
+            return PlayerActions(listOf(PlayerAction.PEEP), (0 until cards.size).toList())
         }
         val index = cards.mapIndexed { idx, card -> if (card.value == diceValue) idx else -1 }.filter { it >= 0 }
-        return PlayerActions(listOf("KEEP", "DROP"), index)
+        return PlayerActions(listOf(PlayerAction.KEEP, PlayerAction.DROP), index)
     }
 
     fun replaceCardAt(cardIndex: Int, card: Card) {
@@ -26,4 +26,3 @@ class DemoZone : Deck() {
     }
 }
 
-data class PlayerActions(val actions: List<String>, val index: List<Int>)
