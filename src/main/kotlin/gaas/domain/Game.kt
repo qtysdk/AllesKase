@@ -1,6 +1,11 @@
 package gaas.domain
 
-import gaas.common.*
+import gaas.common.DefaultFirstPlayerChooser
+import gaas.common.DefaultGameInitializer
+import gaas.common.Event
+import gaas.common.Events
+import gaas.common.FirstPlayerChooser
+import gaas.common.GameInitializer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import kotlin.streams.toList
@@ -21,7 +26,7 @@ class Game {
     val droppedDeck = Deck()
 
     var turn: Turn = BEFORE_THE_FIRST_TURN
-    val dice = Dice()
+    var dice = Dice()
     var cardsInitializer: GameInitializer = DefaultGameInitializer()
     var firstPlayerChooser: FirstPlayerChooser = DefaultFirstPlayerChooser()
 
@@ -89,7 +94,7 @@ class Game {
         if (turn == BEFORE_THE_FIRST_TURN) {
             // it is time for pick the first player
             val player = firstPlayerChooser.pickTheFirstTurnPlayer(this)
-            turn = Turn(player, dice.roll(), listOf("PEEP"))
+            turn = createTurn(player)
             postEvent(Events.turnPlayer(player.id))
             return
         }
@@ -100,9 +105,15 @@ class Game {
         }
 
         val player = players[next]
-        turn = Turn(player, dice.roll(), listOf("PEEP"))
+        turn = createTurn(player)
         postEvent(Events.turnPlayer(player.id))
         return
+    }
+
+    private fun createTurn(player: Player): Turn {
+        val diceValue = dice.roll()
+        val actions = demoZone.createPlayerActions(diceValue)
+        return Turn(player, diceValue, actions.actions, actions.index)
     }
 
     fun resetDecksAndDemoZone() {

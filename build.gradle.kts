@@ -15,6 +15,7 @@ repositories {
 
 dependencies {
     implementation("ch.qos.logback:logback-classic:1.4.4")
+    testImplementation("io.mockk:mockk:1.13.2")
     testImplementation(kotlin("test"))
 }
 

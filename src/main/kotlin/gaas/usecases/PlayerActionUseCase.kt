@@ -1,7 +1,7 @@
 package gaas.usecases
 
+import gaas.common.Events
 import gaas.repository.Database
-import java.lang.RuntimeException
 
 enum class PlayerAction {
     PEEP, KEEP, DROP
@@ -21,13 +21,23 @@ class PlayerActionUseCaseImpl(val database: Database) : PlayerActionUseCase {
             throw RuntimeException("PLEASE WAIT FOR YOUR TURN")
         }
 
+        val cardAtDemoZone = game.demoZone.cards[cardIndex]!!
+
         if (action == PlayerAction.PEEP.name) {
-            val card = game.demoZone.cards[cardIndex]!!
-            turn.player.addPrivateMessage("peep, index:$cardIndex, card: ${card.value}${card.type.name[0]}")
+            turn.player.addPrivateMessage("peep, index:$cardIndex, card: ${cardAtDemoZone.value}${cardAtDemoZone.type.name[0]}")
         }
 
-        // TODO implement KEEP
-        // TODO implement DROP
+        if (action == PlayerAction.KEEP.name) {
+            turn.player.keepCard(cardAtDemoZone)
+            game.demoZone.replaceCart(cardIndex, game.providingDeck.deal())
+            game.postEvent(Events.playerKeepCard(turn.player.id, cardAtDemoZone))
+        }
+
+        if (action == PlayerAction.DROP.name) {
+            game.demoZone.replaceCart(cardIndex, game.providingDeck.deal())
+            game.postEvent(Events.playerDropCard(turn.player.id, cardIndex))
+            game.droppedDeck.cards.add(cardAtDemoZone)
+        }
 
         // request the next player
         game.nextTurnPlayer()
