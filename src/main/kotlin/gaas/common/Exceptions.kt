@@ -9,6 +9,8 @@ val GameDoesNotExistException = IllegalGameStateException("NO_SUCH_GAME_ID")
 val GameHasStartedException = IllegalGameStateException("GAME_HAS_ALREADY_STARTED")
 val GameHasFinishedException = IllegalGameStateException("GAME_HAS_ALREADY_FINISHED")
 
+val PlayerHasBeenDead = IllegalGameStateException("PLAYER_HAS_BEEN_DEAD")
+
 class IllegalPlayerActionException(message: String) : RuntimeException(message)
 
 val InvalidPlayerActionException = IllegalPlayerActionException("INVALID_PLAYER_ACTION")
