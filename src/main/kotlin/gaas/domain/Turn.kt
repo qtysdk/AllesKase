@@ -1,5 +1,6 @@
 package gaas.domain
 
+
 data class Turn(
     val player: Player,
     val diceValue: Int,

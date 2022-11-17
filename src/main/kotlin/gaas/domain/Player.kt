@@ -47,5 +47,8 @@ class Player(val id: String) {
         return "Player(id='$id', alive=$alive, keptCards=$keptCards, privateMessage=$privateMessage)"
     }
 
+    fun toCompatCardsExpression(): String {
+        return keptCards.map { it -> "${it.value}${it.type.name[0]}" }.joinToString(",")
+    }
 
 }

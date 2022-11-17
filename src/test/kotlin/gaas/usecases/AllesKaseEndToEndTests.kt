@@ -47,7 +47,7 @@ class AllesKaseEndToEndTests : BaseEndToEndTests() {
     }
 
     private fun thenGameHasEndedAndTheWinnerGotHigherScores(gameId: String) {
-        val gameStatus: GameStatus = queryGameStatus.query(gameId)
+        val gameStatus: GameStatus = queryGameStatus.query(gameId, null)
         assertEquals(Events.GAME_STARTED, gameStatus.eventAt(0))
         assertEquals(Events.GAME_ENDED, gameStatus.eventAt(1))
         assertEquals(Events.winner(PLAYER_2), gameStatus.eventAt(2))
@@ -55,7 +55,7 @@ class AllesKaseEndToEndTests : BaseEndToEndTests() {
     }
 
     private fun thenGameHasEndedAndAlivePlayerIsTheWinner(gameId: String) {
-        val gameStatus: GameStatus = queryGameStatus.query(gameId)
+        val gameStatus: GameStatus = queryGameStatus.query(gameId, null)
         assertEquals(Events.GAME_STARTED, gameStatus.eventAt(0))
         assertEquals(Events.GAME_ENDED, gameStatus.eventAt(1))
         assertEquals(Events.winner(PLAYER_2), gameStatus.eventAt(2))

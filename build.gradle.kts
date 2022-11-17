@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
+val koin_version: String by project
 
 
 plugins {
@@ -40,6 +41,24 @@ dependencies {
     implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
+}
+
+dependencies {
+    // Koin Core features
+    implementation("io.insert-koin:koin-core:$koin_version")
+    // Koin Test features
+    testImplementation("io.insert-koin:koin-test:$koin_version") {
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-test-junit")
+    }
+    // Koin for JUnit 5
+    testImplementation("io.insert-koin:koin-test-junit5:$koin_version") {
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-test-junit")
+    }
+
+    // Koin for Ktor
+    implementation("io.insert-koin:koin-ktor:$koin_version")
+    // SLF4J Logger
+    implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
 }
 
 tasks.test {

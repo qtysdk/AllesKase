@@ -24,5 +24,9 @@ class DemoZone : Deck() {
     operator fun get(cardIndex: Int): Card {
         return this.cards[cardIndex]
     }
+
+    fun toCompatCardsExpression(): String {
+        return cards.map { it -> "${it.value}${it.type.name[0]}" }.joinToString(",")
+    }
 }
 
