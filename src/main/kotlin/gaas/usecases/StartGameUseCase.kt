@@ -13,7 +13,6 @@ interface StartGameUseCase {
 
     abstract fun start(gameId: String, playerId: String)
 
-
 }
 
 class StartGameUseCaseImpl(private val database: Database) : StartGameUseCase {
@@ -38,11 +37,11 @@ class StartGameUseCaseImpl(private val database: Database) : StartGameUseCase {
     }
 
     private fun validatePreconditions(game: Game, playerId: String) {
-        if (game.events.any { it.message == Events.GAME_STARTED.message }) {
+        if (game.events.any { it == Events.GAME_STARTED }) {
             throw GameHasStartedException
         }
 
-        if (game.events.any { it.message == Events.GAME_ENDED.message }) {
+        if (game.events.any { it == Events.GAME_ENDED }) {
             throw GameHasFinishedException
         }
 
