@@ -3,7 +3,8 @@ package web
 import gaas.repository.Database
 import gaas.usecases.CreateGameUseCase
 import gaas.usecases.CreateGameUseCaseImpl
-import gaas.usecases.QueryGameStatus
+import gaas.usecases.GetGameViewUseCase
+import gaas.usecases.GetGameViewUseCaseImpl
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -31,7 +32,7 @@ fun KoinApplication.initKoinModules() {
     modules(module {
         single { Database() }
         single<CreateGameUseCase> { CreateGameUseCaseImpl(get()) }
-        single { QueryGameStatus(get()) }
+        single<GetGameViewUseCase> { GetGameViewUseCaseImpl(get()) }
     })
 }
 

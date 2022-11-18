@@ -1,5 +1,6 @@
 package web.api
 
+import gaas.ports.GameViewOutput
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -30,10 +31,17 @@ class GameAPITests {
 
         val gameStatusResponse = client.get("/games/${createGameResponse.gameId}/status")
         assertEquals(HttpStatusCode.OK, gameStatusResponse.status)
-        assertEquals(
-            """{"players":[{"playerId":"fake-player-1","alive":true,"keptCards":""}],"events":[],"turn":null,"demoZone":""}""",
-            gameStatusResponse.bodyAsText()
-        )
+
+        val gameViewOutput = Json.decodeFromString<GameViewOutput>(gameStatusResponse.bodyAsText())
+
+        // only the game host in the game
+        assertEquals(1, gameViewOutput.players.size)
+
+        // empty player with id: -
+        assertEquals("-", gameViewOutput.turn.player.playerId)
+
+        // empty demo-zone before the game started
+        assertEquals("", gameViewOutput.demoZone.cards)
     }
 
     private fun ApplicationTestBuilder.initTestApp() {

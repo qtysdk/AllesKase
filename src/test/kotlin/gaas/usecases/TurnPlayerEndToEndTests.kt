@@ -53,7 +53,7 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
         assertEquals(database.playerMap[PLAYER_1]!!.privateMessages(), listOf("peep, index:0, card: 1C"))
 
         // player changed
-        val gameStatus: GameStatus = queryGameStatus.query(gameId, null)
+        val gameStatus: GameStatus = queryGameStatus.query(gameId)
         assertEquals(gameStatus.turn.player.id, PLAYER_2)
 
     }
@@ -66,7 +66,7 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
     }
 
     private fun thenAllPlayerKnowsPublicInformationByEvents(gameId: String) {
-        val gameStatus: GameStatus = queryGameStatus.query(gameId, null)
+        val gameStatus: GameStatus = queryGameStatus.query(gameId)
         var events = gameStatus.events(2)
 
         val demoZone = mockk<DemoZone>()

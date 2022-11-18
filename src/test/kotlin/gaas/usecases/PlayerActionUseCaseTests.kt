@@ -129,13 +129,13 @@ class PlayerActionUseCaseTests : BaseEndToEndTests() {
 
 
     private fun thenTurnPlayerWillBe(gameId: String, playerId: String) {
-        assertEquals(queryGameStatus.query(gameId, null).turn.player.id, playerId)
+        assertEquals(queryGameStatus.query(gameId).turn.player.id, playerId)
     }
 
     private fun thenActionCanDoWithPositions(
         gameId: String, actions: List<PlayerAction>, actionablePosition: List<Int>
     ) {
-        var s = queryGameStatus.query(gameId, null)
+        var s = queryGameStatus.query(gameId)
         assertEquals(actions, s.turn.actionList)
         assertEquals(actionablePosition, s.turn.actionIndex)
     }
