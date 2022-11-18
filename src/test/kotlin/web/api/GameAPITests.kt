@@ -11,6 +11,7 @@ import kotlinx.serialization.json.Json
 import org.koin.ktor.plugin.Koin
 import web.CreateGameRequest
 import web.CreateGameResponse
+import web.JoinGameResponse
 import web.configureAPIs
 import web.initKoinModules
 import kotlin.test.Test
@@ -43,6 +44,24 @@ class GameAPITests {
         // empty demo-zone before the game started
         assertEquals("", gameViewOutput.demoZone.cards)
     }
+
+    @Test
+    fun testJoinGameSuccessfully() = testApplication {
+        initTestApp()
+
+        val response = client.post("/games") {
+            contentType(ContentType.Application.Json)
+            setBody(Json.encodeToString(CreateGameRequest("fake-player-1")))
+        }
+        val gameId = Json.decodeFromString<CreateGameResponse>(response.bodyAsText()).gameId
+        val playerId = "fake-player-2"
+
+        val joinGameResponse = Json.decodeFromString<JoinGameResponse>(
+            client.post("/games/$gameId/player/$playerId/join").bodyAsText()
+        )
+        assertEquals(true, joinGameResponse.isSuccess)
+    }
+
 
     private fun ApplicationTestBuilder.initTestApp() {
         install(Koin) {

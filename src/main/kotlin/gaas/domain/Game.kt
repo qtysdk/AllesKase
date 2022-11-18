@@ -6,6 +6,9 @@ import gaas.common.Event
 import gaas.common.Events
 import gaas.common.FirstPlayerChooser
 import gaas.common.GameInitializer
+import gaas.common.GameRoomHasBeenFull
+import gaas.common.GameRoomHasStarted
+import gaas.common.PlayerHasBeenInTheGame
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import kotlin.streams.toList
@@ -29,6 +32,7 @@ class Game {
     var dice = Dice()
     var cardsInitializer: GameInitializer = DefaultGameInitializer()
     var firstPlayerChooser: FirstPlayerChooser = DefaultFirstPlayerChooser()
+    var started = false
 
     init {
         logger.info("Game[$this] created")
@@ -36,12 +40,32 @@ class Game {
 
 
     fun join(player: Player) {
-        // TODO check the players in 2..4
+        // reject players after the game has started
+        if (started) {
+            throw GameRoomHasStarted
+        }
+
+        if (players.any { it.id == player.id }) {
+            throw PlayerHasBeenInTheGame
+        }
+
+        if (players.size < 6) {
+            // the max players in a game is 6
+            players.add(player)
+            return
+        }
+
+        throw GameRoomHasBeenFull
+
+
         // TODO avoid same player join multiple times
-        players.add(player)
     }
 
     fun postEvent(event: Event) {
+        if (event == Events.GAME_STARTED) {
+            started = true
+        }
+
         logger.info("post-event: $event")
         this.events.add(event)
     }
