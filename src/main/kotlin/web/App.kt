@@ -1,6 +1,7 @@
 package web
 
 import gaas.common.IllegalGameStateException
+import gaas.common.IllegalPlayerActionException
 import gaas.repository.Database
 import gaas.usecases.CreateGameUseCase
 import gaas.usecases.CreateGameUseCaseImpl
@@ -8,6 +9,8 @@ import gaas.usecases.GetGameViewUseCase
 import gaas.usecases.GetGameViewUseCaseImpl
 import gaas.usecases.JoinGameUseCase
 import gaas.usecases.JoinGameUseCaseImpl
+import gaas.usecases.PlayerActionUseCase
+import gaas.usecases.PlayerActionUseCaseImpl
 import gaas.usecases.StartGameUseCase
 import gaas.usecases.StartGameUseCaseImpl
 import io.ktor.http.*
@@ -20,7 +23,6 @@ import kotlinx.serialization.Serializable
 import org.koin.core.KoinApplication
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
-
 
 fun main() {
 
@@ -35,13 +37,12 @@ fun Application.configureStatusPages() {
     install(StatusPages) {
         exception<Throwable> { call, throwable ->
             when (throwable) {
-                is IllegalGameStateException -> {
+                is IllegalGameStateException, is IllegalPlayerActionException -> {
                     call.respond(
                         HttpStatusCode.BadRequest,
                         ErrorMessage(HttpStatusCode.BadRequest.value, throwable.message!!)
                     )
                 }
-
                 else -> {
                     call.respond(
                         HttpStatusCode.InternalServerError,
@@ -70,6 +71,7 @@ fun KoinApplication.initKoinModules() {
         single<GetGameViewUseCase> { GetGameViewUseCaseImpl(get()) }
         single<JoinGameUseCase> { JoinGameUseCaseImpl(get()) }
         single<StartGameUseCase> { StartGameUseCaseImpl(get()) }
+        single<PlayerActionUseCase> { PlayerActionUseCaseImpl(get()) }
     })
 }
 
