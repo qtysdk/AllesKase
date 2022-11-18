@@ -16,6 +16,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
+import kotlinx.serialization.Serializable
 import org.koin.core.KoinApplication
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
@@ -27,13 +28,24 @@ fun main() {
         .start(wait = true)
 }
 
+@Serializable
+data class ErrorMessage(val code: Int, val message: String)
+
 fun Application.configureStatusPages() {
     install(StatusPages) {
-        exception<IllegalGameStateException> { call, throwable ->
+        exception<Throwable> { call, throwable ->
             when (throwable) {
                 is IllegalGameStateException -> {
                     call.respond(
-                        HttpStatusCode.BadRequest, "${throwable.message}"
+                        HttpStatusCode.BadRequest,
+                        ErrorMessage(HttpStatusCode.BadRequest.value, throwable.message!!)
+                    )
+                }
+
+                else -> {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        ErrorMessage(HttpStatusCode.InternalServerError.value, throwable.toString())
                     )
                 }
             }

@@ -68,7 +68,7 @@ class GameAPITests {
 
         val failedResponse = client.post("/games/$gameId/player/fake-player-1/start")
         assertEquals(HttpStatusCode.BadRequest, failedResponse.status)
-        assertEquals("TOO_FEW_PLAYERS", failedResponse.bodyAsText())
+        assertEquals("{\"code\":400,\"message\":\"TOO_FEW_PLAYERS\"}", failedResponse.bodyAsText())
 
 
         // given the second player
@@ -82,7 +82,7 @@ class GameAPITests {
         assertEquals(HttpStatusCode.OK, gameStatusResponse.status)
         println(gameStatusResponse.bodyAsText())
 
-        // then start it again will accepted
+        // then start it again will be accepted
         val response = client.post("/games/$gameId/player/fake-player-1/start")
         assertEquals(HttpStatusCode.Accepted, response.status)
     }
