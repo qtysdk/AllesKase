@@ -1,4 +1,6 @@
-## 遊戲實作：玩命起司
+![](https://github.com/qtysdk/AllesKase/actions/workflows/run-test.yml/badge.svg)
+
+## 遊戲實作：玩命起司 
 
 這個專案中是放置 [遊戲微服務計劃](https://waterball.notion.site/Game-as-a-Service-e636a20876e6484ba0b758fdeaee06f0) 練習程式的地方。
 
