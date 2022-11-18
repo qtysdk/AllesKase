@@ -1,7 +1,7 @@
 package web
 
 import gaas.usecases.CreateGameUseCase
-import gaas.usecases.QueryGameStatus
+import gaas.usecases.GetGameViewUseCase
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -19,33 +19,6 @@ data class CreateGameRequest(val playerId: String)
 @Serializable
 data class CreateGameResponse(val gameId: String)
 
-@Serializable
-class GameStatusEvent {
-
-}
-
-@Serializable
-data class GamePlayer(val playerId: String, val alive: Boolean, val keptCards: String)
-
-@Serializable
-data class GameTurn(val playerId: String, val diceValue: Int, val actionList: String, val actionIndex: String)
-
-@Serializable
-class GameStatusResponse {
-    val players = mutableListOf<GamePlayer>()
-    val events = mutableListOf<GameStatusEvent>()
-    var turn: GameTurn? = null
-    var demoZone = ""
-
-    fun addPlayer(playerId: String, alive: Boolean, cards: String) {
-        players.add(GamePlayer(playerId, alive, cards))
-    }
-
-    fun turn(playerId: String, diceValue: Int, actionList: String, actionIndex: String) {
-        turn = GameTurn(playerId, diceValue, actionList, actionIndex)
-    }
-
-}
 
 fun Application.configureAPIs() {
 
@@ -54,7 +27,7 @@ fun Application.configureAPIs() {
     }
 
     val createGameUseCase by inject<CreateGameUseCase>()
-    val queryGameStatus by inject<QueryGameStatus>()
+    val getGameViewUseCase by inject<GetGameViewUseCase>()
 
     routing {
         get("/") {
@@ -77,9 +50,7 @@ fun Application.configureAPIs() {
                 call.respond(HttpStatusCode.BadRequest)
             }
 
-            val response = GameStatusResponse()
-            queryGameStatus.query(gameId!!, response)
-            call.respond(response)
+            call.respond(getGameViewUseCase.fetch(gameId!!))
 
         }
     }
