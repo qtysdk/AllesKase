@@ -5,6 +5,7 @@ import gaas.common.Events
 import gaas.common.GameInitializer
 import gaas.domain.Card
 import gaas.domain.CardType
+import gaas.domain.DemoZone
 import gaas.domain.Dice
 import gaas.domain.Game
 import gaas.domain.GameStatus
@@ -68,7 +69,10 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
         val gameStatus: GameStatus = queryGameStatus.query(gameId, null)
         var events = gameStatus.events(2)
 
-        assertEquals(Events.demoZone("demo-zone: 1C_1T_5T_5C_6T_6T"), events[0])
+        val demoZone = mockk<DemoZone>()
+        every { demoZone.toCompatCardsExpression() } returns "1C,1T,5T,5C,6T,6T"
+
+        assertEquals(Events.demoZone(demoZone), events[0])
         assertEquals(Events.turnPlayer(PLAYER_1), events[1])
     }
 

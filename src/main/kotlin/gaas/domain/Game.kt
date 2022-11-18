@@ -90,7 +90,7 @@ class Game {
             return
         }
 
-        this.postEvent(Events.demoZone(this.demoZone.asEvent()))
+        this.postEvent(Events.demoZone(demoZone))
         if (turn == BEFORE_THE_FIRST_TURN) {
             // it is time for pick the first player
             val player = firstPlayerChooser.pickTheFirstTurnPlayer(this)

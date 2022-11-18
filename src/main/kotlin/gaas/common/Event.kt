@@ -1,6 +1,7 @@
 package gaas.common
 
 import gaas.domain.Card
+import gaas.domain.DemoZone
 import java.time.LocalDateTime
 
 enum class EventType {
@@ -69,9 +70,9 @@ class Events {
             return Event(EventType.GAME_CHANGE_TURN_PLAYER, playerId)
         }
 
-        fun demoZone(demoZoneState: String): Event {
+        fun demoZone(demoZone: DemoZone): Event {
             val event = Event(EventType.DEMO_ZONE_CHANGED)
-            event.data = demoZoneState
+            event.data = demoZone.toCompatCardsExpression()
             return event
         }
 
