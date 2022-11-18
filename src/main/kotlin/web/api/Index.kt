@@ -3,6 +3,7 @@ package web
 import gaas.usecases.CreateGameUseCase
 import gaas.usecases.GetGameViewUseCase
 import gaas.usecases.JoinGameUseCase
+import gaas.usecases.StartGameUseCase
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -26,6 +27,8 @@ data class JoinGameResponse(val isSuccess: Boolean)
 
 fun Application.configureAPIs() {
 
+
+
     install(ContentNegotiation) {
         json()
     }
@@ -33,6 +36,7 @@ fun Application.configureAPIs() {
     val createGameUseCase by inject<CreateGameUseCase>()
     val getGameViewUseCase by inject<GetGameViewUseCase>()
     val joinGameUseCase by inject<JoinGameUseCase>()
+    val startGameUseCase by inject<StartGameUseCase>()
 
     routing {
         get("/") {
@@ -58,6 +62,7 @@ fun Application.configureAPIs() {
             call.respond(getGameViewUseCase.fetch(gameId!!))
         }
 
+        // join game
         post("/games/{gameId}/player/{playerId}/join") {
             val gameId = call.parameters["gameId"]
             val playerId = call.parameters["playerId"]
@@ -65,6 +70,18 @@ fun Application.configureAPIs() {
                 call.respond(HttpStatusCode.BadRequest)
             }
             call.respond(JoinGameResponse(joinGameUseCase.join(gameId!!, playerId!!)))
+        }
+
+        // start game
+        post("/games/{gameId}/player/{hostPlayerId}/start") {
+            val gameId = call.parameters["gameId"]
+            val playerId = call.parameters["hostPlayerId"]
+            if (gameId == null || playerId == null) {
+                call.respond(HttpStatusCode.BadRequest)
+            }
+
+            startGameUseCase.start(gameId!!, playerId!!)
+            call.respond(HttpStatusCode.Accepted)
         }
     }
 }
