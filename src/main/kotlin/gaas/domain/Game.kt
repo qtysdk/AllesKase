@@ -63,8 +63,8 @@ class Game {
     }
 
     private fun announceScores() {
-        val scoreList = players.stream().map { it -> "${it.id} got ${it.scores()} scores" }.toList()
-        this.postEvent(Events.scoreList(scoreList.joinToString(", ")))
+        val scoreList = players.stream().map { it -> "${it.id}:${it.scores()}" }.toList()
+        this.postEvent(Events.scoreList(scoreList.joinToString(",")))
     }
 
     fun closeGameByEmptyProvidingDeckRule(): Boolean {

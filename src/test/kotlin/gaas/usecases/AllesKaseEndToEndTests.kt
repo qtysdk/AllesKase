@@ -51,7 +51,7 @@ class AllesKaseEndToEndTests : BaseEndToEndTests() {
         assertEquals(Events.GAME_STARTED, gameStatus.eventAt(0))
         assertEquals(Events.GAME_ENDED, gameStatus.eventAt(1))
         assertEquals(Events.winner(PLAYER_2), gameStatus.eventAt(2))
-        assertEquals(Events.scoreList("$PLAYER_1 got 4 scores, $PLAYER_2 got 6 scores"), gameStatus.eventAt(3))
+        assertEquals(Events.scoreList("$PLAYER_1:4,$PLAYER_2:6"), gameStatus.eventAt(3))
     }
 
     private fun thenGameHasEndedAndAlivePlayerIsTheWinner(gameId: String) {
@@ -59,7 +59,7 @@ class AllesKaseEndToEndTests : BaseEndToEndTests() {
         assertEquals(Events.GAME_STARTED, gameStatus.eventAt(0))
         assertEquals(Events.GAME_ENDED, gameStatus.eventAt(1))
         assertEquals(Events.winner(PLAYER_2), gameStatus.eventAt(2))
-        assertEquals(Events.scoreList("player-1 got 0 scores, player-2 got 0 scores"), gameStatus.eventAt(3))
+        assertEquals(Events.scoreList("player-1:0,player-2:0"), gameStatus.eventAt(3))
     }
 
 }
