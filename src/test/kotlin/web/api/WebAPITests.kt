@@ -17,7 +17,7 @@ class WebAPITests {
 
         val response = client.get("/")
         assertEquals(
-            """{"hello":"world"}""",
+            """Welcome to GaaS :: Alles Kase Game (玩命起司)""",
             response.bodyAsText()
         )
         assertEquals(HttpStatusCode.OK, response.status)

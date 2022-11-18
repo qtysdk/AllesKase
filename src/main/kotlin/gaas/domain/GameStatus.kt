@@ -4,6 +4,7 @@ import gaas.common.Event
 import java.util.*
 import kotlin.streams.toList
 
+
 class GameStatus {
 
     var turn: Turn = BEFORE_THE_FIRST_TURN
