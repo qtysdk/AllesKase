@@ -85,7 +85,7 @@ fun Application.configureAPIs() {
             call.respond(HttpStatusCode.Accepted)
         }
 
-        // start game
+        // player do action
         post("/games/{gameId}/player/{playerId}/act") {
             val playActionRequest = call.receive<PlayActionRequest>()
 
