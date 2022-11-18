@@ -12,6 +12,7 @@ import org.koin.ktor.plugin.Koin
 import web.CreateGameRequest
 import web.CreateGameResponse
 import web.JoinGameResponse
+import web.PlayActionRequest
 import web.configureAPIs
 import web.configureStatusPages
 import web.initKoinModules
@@ -30,7 +31,6 @@ class GameAPITests {
         }
         val createGameResponse = Json.decodeFromString<CreateGameResponse>(response.bodyAsText())
         assertEquals(HttpStatusCode.OK, response.status)
-
 
         val gameStatusResponse = client.get("/games/${createGameResponse.gameId}/status")
         assertEquals(HttpStatusCode.OK, gameStatusResponse.status)
@@ -61,7 +61,7 @@ class GameAPITests {
     }
 
     @Test
-    fun testStartGame() = testApplication {
+    fun testStartGameAndPlay() = testApplication {
         initTestApp()
 
         val gameId = givenCreatedGame()
@@ -70,7 +70,6 @@ class GameAPITests {
         assertEquals(HttpStatusCode.BadRequest, failedResponse.status)
         assertEquals("{\"code\":400,\"message\":\"TOO_FEW_PLAYERS\"}", failedResponse.bodyAsText())
 
-
         // given the second player
         assertTrue(
             Json.decodeFromString<JoinGameResponse>(
@@ -78,13 +77,28 @@ class GameAPITests {
             ).isSuccess
         )
 
-        val gameStatusResponse = client.get("/games/$gameId/status")
-        assertEquals(HttpStatusCode.OK, gameStatusResponse.status)
-        println(gameStatusResponse.bodyAsText())
-
         // then start it again will be accepted
         val response = client.post("/games/$gameId/player/fake-player-1/start")
         assertEquals(HttpStatusCode.Accepted, response.status)
+
+        // give the player action context from game view
+        val gameStatusResponse = client.get("/games/$gameId/status")
+        assertEquals(HttpStatusCode.OK, gameStatusResponse.status)
+        val gameView = Json.decodeFromString<GameViewOutput>(gameStatusResponse.bodyAsText())
+
+        // when player do action with wrong index then get INVALID_CARD_INDEX
+        val invalidActionResponse = client.post("/games/$gameId/player/${gameView.turn.player.playerId}/act") {
+            contentType(ContentType.Application.Json)
+            setBody(Json.encodeToString(PlayActionRequest(gameView.turn.actionList[0], 5566)))
+        }
+        assertEquals("{\"code\":400,\"message\":\"INVALID_CARD_INDEX\"}", invalidActionResponse.bodyAsText())
+
+        // when player do action with valid index then get accepted
+        val validActionResponse = client.post("/games/$gameId/player/${gameView.turn.player.playerId}/act") {
+            contentType(ContentType.Application.Json)
+            setBody(Json.encodeToString(PlayActionRequest(gameView.turn.actionList[0], gameView.turn.actionIndex[0])))
+        }
+        assertEquals(HttpStatusCode.Accepted, validActionResponse.status)
     }
 
     private suspend fun ApplicationTestBuilder.givenCreatedGame(): String {
@@ -95,7 +109,6 @@ class GameAPITests {
         val gameId = Json.decodeFromString<CreateGameResponse>(response.bodyAsText()).gameId
         return gameId
     }
-
 
     private fun ApplicationTestBuilder.initTestApp() {
         install(Koin) {
