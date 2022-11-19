@@ -14,6 +14,7 @@ class GetGameViewUseCaseImpl(private val database: Database) : GetGameViewUseCas
     override fun fetch(gameId: String): GameViewOutput {
         val game = database.findGameById(gameId)!!
         return GameViewOutput(
+            gameId,
             game.players.map { player ->
                 PlayerOutput(
                     player.id,
@@ -38,6 +39,5 @@ class GetGameViewUseCaseImpl(private val database: Database) : GetGameViewUseCas
         )
 
     }
-
 
 }
