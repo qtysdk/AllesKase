@@ -12,6 +12,7 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.util.pipeline.*
 import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 
@@ -59,43 +60,37 @@ fun Application.configureAPIs() {
             if (gameId == null) {
                 call.respond(HttpStatusCode.BadRequest)
             }
-
             call.respond(getGameViewUseCase.fetch(gameId!!))
         }
 
         // join game
         post("/games/{gameId}/player/{playerId}/join") {
-            val gameId = call.parameters["gameId"]
-            val playerId = call.parameters["playerId"]
-            if (gameId == null || playerId == null) {
-                call.respond(HttpStatusCode.BadRequest)
-            }
-            call.respond(JoinGameResponse(joinGameUseCase.join(gameId!!, playerId!!)))
+            val (gameId, playerId) = getGameAndPlayer()
+            call.respond(JoinGameResponse(joinGameUseCase.join(gameId, playerId)))
         }
 
         // start game
-        post("/games/{gameId}/player/{hostPlayerId}/start") {
-            val gameId = call.parameters["gameId"]
-            val playerId = call.parameters["hostPlayerId"]
-            if (gameId == null || playerId == null) {
-                call.respond(HttpStatusCode.BadRequest)
-            }
-
-            startGameUseCase.start(gameId!!, playerId!!)
+        post("/games/{gameId}/player/{playerId}/start") {
+            val (gameId, playerId) = getGameAndPlayer()
+            startGameUseCase.start(gameId, playerId)
             call.respond(HttpStatusCode.Accepted)
         }
 
         // player do action
         post("/games/{gameId}/player/{playerId}/act") {
             val playActionRequest = call.receive<PlayActionRequest>()
-
-            val gameId = call.parameters["gameId"]
-            val playerId = call.parameters["playerId"]
-            if (gameId == null || playerId == null) {
-                call.respond(HttpStatusCode.BadRequest)
-            }
-            playerActionUseCase.doAction(gameId!!, playerId!!, playActionRequest.action, playActionRequest.index)
+            val (gameId, playerId) = getGameAndPlayer()
+            playerActionUseCase.doAction(gameId, playerId, playActionRequest.action, playActionRequest.index)
             call.respond(HttpStatusCode.Accepted)
         }
     }
+}
+
+private suspend fun PipelineContext<Unit, ApplicationCall>.getGameAndPlayer(): Pair<String, String> {
+    val gameId = call.parameters["gameId"]
+    val playerId = call.parameters["playerId"]
+    if (gameId == null || playerId == null) {
+        call.respond(HttpStatusCode.BadRequest)
+    }
+    return Pair(gameId!!, playerId!!)
 }
