@@ -2,7 +2,7 @@ package gaas.repository
 
 import gaas.domain.Game
 import gaas.domain.Player
-import java.util.*
+import java.util.UUID
 
 class Database {
 

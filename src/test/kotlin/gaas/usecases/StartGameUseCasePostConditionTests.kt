@@ -1,10 +1,7 @@
 package gaas.usecases
 
-import gaas.common.*
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class StartGameUseCasePostConditionTests : BaseEndToEndTests() {

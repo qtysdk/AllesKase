@@ -1,8 +1,13 @@
 package gaas.usecases
 
-import gaas.common.*
+import gaas.common.CannotStartGameByNonHostPlayerException
+import gaas.common.CannotStartGameWithTooFewPlayersException
+import gaas.common.Events
+import gaas.common.GameDoesNotExistException
+import gaas.common.GameHasFinishedException
+import gaas.common.GameHasStartedException
+import gaas.common.IllegalGameStateException
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 

@@ -1,9 +1,8 @@
 package gaas.domain
 
 import gaas.common.Event
-import java.util.*
+import java.util.Collections
 import kotlin.streams.toList
-
 
 class GameStatus {
 
@@ -15,8 +14,7 @@ class GameStatus {
         return events.stream().skip(skip.toLong()).toList()
     }
 
-    fun eventAt(index: Int) = events[index]!!
-
+    fun eventAt(index: Int) = events[index]
 
     fun refreshGameStatus(game: Game) {
         this.events = Collections.unmodifiableList(game.events)
@@ -26,6 +24,5 @@ class GameStatus {
     override fun toString(): String {
         return "GameStatus(turn=$turn, events=$events)"
     }
-
 
 }
