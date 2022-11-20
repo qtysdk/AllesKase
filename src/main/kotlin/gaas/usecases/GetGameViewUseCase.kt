@@ -1,25 +1,34 @@
 package gaas.usecases
 
-import gaas.ports.DemoZoneOutput
+import gaas.common.Event
+import gaas.domain.Deck
+import gaas.domain.Game
+import gaas.domain.Player
+import gaas.ports.DeckTopCard
+import gaas.ports.EventOutput
 import gaas.ports.GameViewOutput
 import gaas.ports.PlayerOutput
 import gaas.ports.TurnOutput
 import gaas.repository.Database
+import java.time.format.DateTimeFormatter
 
 interface GetGameViewUseCase {
-    fun fetch(gameId: String): GameViewOutput
+    fun fetch(gameId: String, playerId: String): GameViewOutput
+
 }
 
 class GetGameViewUseCaseImpl(private val database: Database) : GetGameViewUseCase {
-    override fun fetch(gameId: String): GameViewOutput {
+    override fun fetch(gameId: String, playerId: String): GameViewOutput {
         val game = database.findGameById(gameId)!!
+        val player = database.findPlayerById(playerId)!!
         return GameViewOutput(
-            game.players.map { player ->
+            gameId,
+            game.players.map { p ->
                 PlayerOutput(
-                    player.id,
-                    player.toCompatCardsExpression(),
-                    player.scores(),
-                    player.alive
+                    p.id,
+                    p.toCompatCardsExpression(),
+                    p.scores(),
+                    p.alive
                 )
             }.toList(),
             game.turn.let {
@@ -34,10 +43,33 @@ class GetGameViewUseCaseImpl(private val database: Database) : GetGameViewUseCas
                     game.turn.actionList.map { action -> action.name }.toList(),
                     game.turn.actionIndex.toList()
                 )
-            }, DemoZoneOutput(game.demoZone.toCompatCardsExpression())
+            }, game.demoZone.toCardValues(),
+            toDeckTopView(game.providingDeck),
+            toDeckTopView(game.droppedDeck),
+            toEvents(game, player)
         )
 
     }
 
+    private fun toEvents(game: Game, player: Player): List<EventOutput> {
+        val mergedEvents = mutableListOf<Event>()
+        mergedEvents.addAll(game.events)
+        mergedEvents.addAll(player.events())
+        mergedEvents.sortBy { e -> e.createAt }
+        return mergedEvents.map { it ->
+            EventOutput(
+                it.type.name,
+                it.createAt.format(DateTimeFormatter.ISO_DATE_TIME),
+                it.data ?: ""
+            )
+        }.toList()
+    }
+
+    private fun toDeckTopView(deck: Deck): DeckTopCard {
+        if (deck.isEmpty()) {
+            return DeckTopCard(0, 0)
+        }
+        return DeckTopCard(deck.last().value, deck.size())
+    }
 
 }

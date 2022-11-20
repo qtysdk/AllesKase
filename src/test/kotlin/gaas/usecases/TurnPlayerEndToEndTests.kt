@@ -25,7 +25,6 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
         givenPlayerWithId(PLAYER_1)
         givenPlayerWithId(PLAYER_2)
 
-
         val gameId = givenGameWithPlayers(PLAYER_1, PLAYER_2)
         givenDemoZoneWithCards_1C_1T_5T_5C_6T_6T(gameId)
 
@@ -50,7 +49,10 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
     private fun whenTurnPlayerDoActionThenSwitchToTheNextPlayer(gameId: String) {
         playerActionUseCase.doAction(gameId, PLAYER_1, "PEEP", 0)
         // player 1 got the private message for peep the card
-        assertEquals(database.playerMap[PLAYER_1]!!.privateMessages(), listOf("peep, index:0, card: 1C"))
+        assertEquals(
+            database.playerMap[PLAYER_1]!!.events()[0],
+            Events.playerPeepCardInPrivate(PLAYER_1, Card(1, CardType.CHEESE))
+        )
 
         // player changed
         val gameStatus: GameStatus = queryGameStatus.query(gameId)
@@ -70,7 +72,7 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
         var events = gameStatus.events(2)
 
         val demoZone = mockk<DemoZone>()
-        every { demoZone.toCompatCardsExpression() } returns "1C,1T,5T,5C,6T,6T"
+        every { demoZone.toCardValues() } returns listOf(1, 1, 5, 5, 6, 6)
 
         assertEquals(Events.demoZone(demoZone), events[0])
         assertEquals(Events.turnPlayer(PLAYER_1), events[1])

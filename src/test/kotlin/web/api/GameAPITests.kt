@@ -37,7 +37,7 @@ class GameAPITests {
         val createGameResponse = Json.decodeFromString<CreateGameResponse>(response.bodyAsText())
         assertEquals(HttpStatusCode.OK, response.status)
 
-        val gameStatusResponse = client.get("/games/${createGameResponse.gameId}/status")
+        val gameStatusResponse = client.get("/games/${createGameResponse.gameId}/player/fake-player-1/status")
         assertEquals(HttpStatusCode.OK, gameStatusResponse.status)
 
         val gameViewOutput = Json.decodeFromString<GameViewOutput>(gameStatusResponse.bodyAsText())
@@ -49,7 +49,7 @@ class GameAPITests {
         assertEquals("-", gameViewOutput.turn.player.playerId)
 
         // empty demo-zone before the game started
-        assertEquals("", gameViewOutput.demoZone.cards)
+        assertEquals(emptyList(), gameViewOutput.demoZone)
     }
 
     @Test
@@ -87,7 +87,7 @@ class GameAPITests {
         assertEquals(HttpStatusCode.Accepted, response.status)
 
         // give the player action context from game view
-        val gameStatusResponse = client.get("/games/$gameId/status")
+        val gameStatusResponse = client.get("/games/$gameId/player/fake-player-1/status")
         assertEquals(HttpStatusCode.OK, gameStatusResponse.status)
         val gameView = Json.decodeFromString<GameViewOutput>(gameStatusResponse.bodyAsText())
 

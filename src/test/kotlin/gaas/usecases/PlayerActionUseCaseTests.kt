@@ -1,5 +1,6 @@
 package gaas.usecases
 
+import gaas.common.Events
 import gaas.common.GameInitializer
 import gaas.common.IllegalPlayerActionException
 import gaas.domain.Card
@@ -33,7 +34,10 @@ class PlayerActionUseCaseTests : BaseEndToEndTests() {
         playerActionUseCase.doAction(gameId, PLAYER_1, "PEEP", 2)
 
         // then player see the 3C in the private message
-        assertEquals(database.findPlayerById(PLAYER_1)!!.privateMessages()[0], "peep, index:2, card: 3C")
+        assertEquals(
+            database.findPlayerById(PLAYER_1)!!.events()[0],
+            Events.playerPeepCardInPrivate(PLAYER_1, Card(3, CardType.CHEESE))
+        )
     }
 
     @Test
@@ -88,7 +92,6 @@ class PlayerActionUseCaseTests : BaseEndToEndTests() {
         assertEquals(CardType.TRAP, refilledCard.type)
     }
 
-
     @Test
     internal fun test_player_does_invalid_action_or_card_index() {
         givenPlayerWithId(PLAYER_1)
@@ -127,7 +130,6 @@ class PlayerActionUseCaseTests : BaseEndToEndTests() {
 
     }
 
-
     private fun thenTurnPlayerWillBe(gameId: String, playerId: String) {
         assertEquals(queryGameStatus.query(gameId).turn.player.id, playerId)
     }
@@ -149,7 +151,6 @@ class PlayerActionUseCaseTests : BaseEndToEndTests() {
                 game.providingDeck.add(Card(6, CardType.TRAP))
                 game.providingDeck.add(Card(6, CardType.TRAP))
 
-
                 // set demoZone cards all 1 point cheese
                 game.demoZone.clear()
 
@@ -160,13 +161,11 @@ class PlayerActionUseCaseTests : BaseEndToEndTests() {
                 game.demoZone.add(Card(5, CardType.CHEESE))
                 game.demoZone.add(Card(2, CardType.CHEESE))
 
-
                 // make sure the dice always get $diceValue
                 game.dice = mockk<Dice>()
                 every { game.dice.roll() } returns diceValue
             }
         }
     }
-
 
 }

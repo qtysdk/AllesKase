@@ -2,7 +2,6 @@ package gaas.domain
 
 class DemoZone : Deck() {
 
-
     fun createPlayerActions(diceValue: Int): PlayerActions {
         if (!cards.any { card -> card.value == diceValue }) {
             return PlayerActions(listOf(PlayerAction.PEEP), (0 until cards.size).toList())
@@ -19,8 +18,9 @@ class DemoZone : Deck() {
         return this.cards[cardIndex]
     }
 
-    fun toCompatCardsExpression(): String {
-        return cards.map { it -> "${it.value}${it.type.name[0]}" }.joinToString(",")
+    fun toCardValues(): List<Int> {
+        return cards.map { it -> it.value }.toList()
     }
+
 }
 

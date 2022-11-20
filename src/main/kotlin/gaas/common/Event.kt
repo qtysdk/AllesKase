@@ -12,7 +12,11 @@ enum class EventType {
     SCORE_LIST_ANNOUNCED,
     DEMO_ZONE_CHANGED,
     PLAYER_DID_KEEP,
-    PLAYER_DID_DROP
+    PLAYER_DID_DROP,
+    PLAYER_DID_PEEP,
+
+    // the event only save to the player's private events
+    PLAYER_PRIVATE_PEEP_DATA,
 }
 
 class Event(val type: EventType) {
@@ -72,12 +76,20 @@ class Events {
 
         fun demoZone(demoZone: DemoZone): Event {
             val event = Event(EventType.DEMO_ZONE_CHANGED)
-            event.data = demoZone.toCompatCardsExpression()
+            event.data = demoZone.toCardValues().toString()
             return event
         }
 
-        fun playerKeepCard(playerId: String, card: Card): Event {
-            return Event(EventType.PLAYER_DID_KEEP, playerId, card.toCompatExpr())
+        fun playerKeepCard(playerId: String, cardIndex: Int): Event {
+            return Event(EventType.PLAYER_DID_KEEP, playerId, "" + cardIndex)
+        }
+
+        fun playerPeepCardInPrivate(playerId: String, card: Card): Event {
+            return Event(EventType.PLAYER_PRIVATE_PEEP_DATA, playerId, card.toCompatExpr())
+        }
+
+        fun playerPeepCard(playerId: String, cardIndex: Int): Event {
+            return Event(EventType.PLAYER_DID_PEEP, playerId, "" + cardIndex)
         }
 
         fun playerDropCard(playerId: String, cardIndex: Int): Event {
