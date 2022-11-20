@@ -70,37 +70,37 @@ function GameViewComponent(props: GameViewProps) {
     return <Box>
 
         <Box>
-            {gameView && gameView.players.map(player => {
+            {gameView.players.map(player => {
                 return <PlayerZoneComponent player={player}/>
             })}
         </Box>
-        {gameView &&
-            <Box mb={10}>
-                <Box>
-                    <li>Game Id：{gameView?.gameId} </li>
-                    <li>展示區：{gameView?.demoZone.cards} </li>
-                    <li>供應牌張數：</li>
-                    <li>棄牌堆張數：</li>
-                    <li>你的 Player Id：{game.playerId}</li>
-                    <li>目前玩家：{gameView?.turn.player.playerId}</li>
-                    <li>是 Host?：{gameView.players[0].playerId == game.playerId ? 'yes' : 'no'}</li>
-                    <li>骰子點數：{gameView.turn.diceValue}</li>
-                    <li>可以選擇的動作：{gameView.turn.actionList}</li>
-                    <li>可以選擇的位置：{gameView.turn.actionIndex}</li>
-                </Box>
-                <Box height={150} backgroundColor="blue.50" p={5}>
-                    {
-                        availabeActions.map(x => {
-                            return <Button colorScheme="facebook" m={1} onClick={(e) => {
-                                PlayActionApi(game.gameId, game.playerId, x.action, x.index)
-                            }
-                            }>{JSON.stringify(x)}</Button>
-                        })
-                    }
 
-                </Box>
+        <Box mb={10}>
+            <Box>
+                <li>Game Id：{gameView.gameId} </li>
+                <li>展示區：{JSON.stringify(gameView.demoZone)} </li>
+                <li>供應牌資料：{JSON.stringify(gameView.providingDeck)}</li>
+                <li>棄牌堆資料：{JSON.stringify(gameView.droppedDeck)}</li>
+                <li>你的 Player Id：{game.playerId}</li>
+                <li>目前玩家：{gameView.turn.player.playerId}</li>
+                <li>是 Host?：{gameView.players[0].playerId == game.playerId ? 'yes' : 'no'}</li>
+                <li>骰子點數：{gameView.turn.diceValue}</li>
+                <li>可以選擇的動作：{gameView.turn.actionList}</li>
+                <li>可以選擇的位置：{gameView.turn.actionIndex}</li>
             </Box>
-        }
+            <Box height={150} backgroundColor="blue.50" p={5}>
+                {
+                    availabeActions.map(x => {
+                        return <Button colorScheme="facebook" m={1} onClick={(e) => {
+                            PlayActionApi(game.gameId, game.playerId, x.action, x.index)
+                        }
+                        }>{JSON.stringify(x)}</Button>
+                    })
+                }
+
+            </Box>
+        </Box>
+
     </Box>;
 }
 

@@ -21,9 +21,16 @@ export interface Turn {
     diceValue: number;
 }
 
+export interface DeckInfo {
+    value: number;
+    numberOfCards: number;
+}
+
 export interface GameView {
     gameId: string;
     players: Array<Player>;
-    demoZone: DemoZone;
+    demoZone: Array<number>;
     turn: Turn;
+    providingDeck: DeckInfo;
+    droppedDeck: DeckInfo;
 }
