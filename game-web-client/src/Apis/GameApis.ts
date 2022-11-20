@@ -6,8 +6,8 @@ interface GetGameViewResponse {
     onError(reason: string)
 }
 
-export function GetGameView(gameId: string, callback: GetGameViewResponse) {
-    return fetch(`http://localhost:8080/games/${gameId}/status`, {
+export function GetGameView(gameId: string, playerId: string, callback: GetGameViewResponse) {
+    return fetch(`http://localhost:8080/games/${gameId}/player/${playerId}/status`, {
         method: "GET",
         headers: {
             "content-type": "application/json"

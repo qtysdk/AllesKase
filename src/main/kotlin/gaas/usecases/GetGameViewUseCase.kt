@@ -8,11 +8,11 @@ import gaas.ports.TurnOutput
 import gaas.repository.Database
 
 interface GetGameViewUseCase {
-    fun fetch(gameId: String): GameViewOutput
+    fun fetch(gameId: String, playerId: String): GameViewOutput
 }
 
 class GetGameViewUseCaseImpl(private val database: Database) : GetGameViewUseCase {
-    override fun fetch(gameId: String): GameViewOutput {
+    override fun fetch(gameId: String, playerId: String): GameViewOutput {
         val game = database.findGameById(gameId)!!
         return GameViewOutput(
             gameId,

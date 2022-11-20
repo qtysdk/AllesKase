@@ -11,7 +11,6 @@ class JoinGameUseCaseTests : BaseEndToEndTests() {
 
     private val getGameViewUseCase = GetGameViewUseCaseImpl(database)
 
-
     @Test
     internal fun test_join_game_happy_path() {
         val gameId = givenGameWithPlayers(givenPlayerWithId("i-am-the-host").id)
@@ -39,17 +38,15 @@ class JoinGameUseCaseTests : BaseEndToEndTests() {
 
     }
 
-
     @Test
     internal fun test_join_game_dont_allow_when_the_player_has_joined() {
         val playerId = givenPlayerWithId("i-am-the-host").id
         val gameId = givenGameWithPlayers(playerId)
 
-        val stateBeforeJoinDuplicatedPlayer = getGameViewUseCase.fetch(gameId)
+        val stateBeforeJoinDuplicatedPlayer = getGameViewUseCase.fetch(gameId, playerId)
         assertFalse(joinGameUseCase.join(gameId, playerId))
-        val stateAfterJoinDuplicatedPlayer = getGameViewUseCase.fetch(gameId)
+        val stateAfterJoinDuplicatedPlayer = getGameViewUseCase.fetch(gameId, playerId)
         assertEquals(stateBeforeJoinDuplicatedPlayer, stateAfterJoinDuplicatedPlayer)
     }
-
 
 }

@@ -110,7 +110,7 @@ function App() {
     const [refresher, setRefresher] = useState<boolean>(false);
 
     const refreshGameView = () => {
-        GetGameView(game?.gameId, {
+        GetGameView(game?.gameId, game?.playerId, {
             onGameView(view: GameView) {
                 setGameView(view)
             },

@@ -61,12 +61,9 @@ fun Application.configureAPIs() {
         }
 
         // query game status
-        get("/games/{gameId}/status") {
-            val gameId = call.parameters["gameId"]
-            if (gameId == null) {
-                call.respond(HttpStatusCode.BadRequest)
-            }
-            call.respond(getGameViewUseCase.fetch(gameId!!))
+        get("/games/{gameId}/player/{playerId}/status") {
+            val (gameId, playerId) = getGameAndPlayer()
+            call.respond(getGameViewUseCase.fetch(gameId, playerId))
         }
 
         // join game
