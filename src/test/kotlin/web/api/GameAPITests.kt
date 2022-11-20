@@ -49,7 +49,7 @@ class GameAPITests {
         assertEquals("-", gameViewOutput.turn.player.playerId)
 
         // empty demo-zone before the game started
-        assertEquals("", gameViewOutput.demoZone.cards)
+        assertEquals(emptyList(), gameViewOutput.demoZone)
     }
 
     @Test

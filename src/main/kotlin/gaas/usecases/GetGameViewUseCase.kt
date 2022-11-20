@@ -1,6 +1,7 @@
 package gaas.usecases
 
-import gaas.ports.DemoZoneOutput
+import gaas.domain.Deck
+import gaas.ports.DeckTopCard
 import gaas.ports.GameViewOutput
 import gaas.ports.PlayerOutput
 import gaas.ports.TurnOutput
@@ -35,9 +36,18 @@ class GetGameViewUseCaseImpl(private val database: Database) : GetGameViewUseCas
                     game.turn.actionList.map { action -> action.name }.toList(),
                     game.turn.actionIndex.toList()
                 )
-            }, DemoZoneOutput(game.demoZone.toCompatCardsExpression())
+            }, game.demoZone.toCardValues(),
+            toDeckTopView(game.providingDeck),
+            toDeckTopView(game.droppedDeck)
         )
 
+    }
+
+    private fun toDeckTopView(deck: Deck): DeckTopCard {
+        if (deck.isEmpty()) {
+            return DeckTopCard(0, 0)
+        }
+        return DeckTopCard(deck.last().value, deck.size())
     }
 
 }

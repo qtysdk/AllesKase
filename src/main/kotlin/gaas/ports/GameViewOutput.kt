@@ -11,6 +11,9 @@ data class PlayerOutput(
 )
 
 @Serializable
+data class DeckTopCard(val value: Int, val numberOfCards: Int)
+
+@Serializable
 data class TurnOutput(
     val player: PlayerOutput,
     val diceValue: Int,
@@ -19,12 +22,11 @@ data class TurnOutput(
 )
 
 @Serializable
-data class DemoZoneOutput(val cards: String)
-
-@Serializable
 data class GameViewOutput(
     val gameId: String,
     val players: List<PlayerOutput>,
     val turn: TurnOutput,
-    val demoZone: DemoZoneOutput
+    val demoZone: List<Int>,
+    val providingDeck: DeckTopCard,
+    val droppedDeck: DeckTopCard
 )

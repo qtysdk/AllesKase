@@ -72,7 +72,7 @@ class Events {
 
         fun demoZone(demoZone: DemoZone): Event {
             val event = Event(EventType.DEMO_ZONE_CHANGED)
-            event.data = demoZone.toCompatCardsExpression()
+            event.data = demoZone.toCardValues().toString()
             return event
         }
 
