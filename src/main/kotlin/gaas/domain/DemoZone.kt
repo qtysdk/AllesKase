@@ -20,7 +20,9 @@ class DemoZone : Deck() {
     }
 
     fun toCompatCardsExpression(): String {
-        return cards.map { it -> "${it.value}${it.type.name[0]}" }.joinToString(",")
+        return cards.map { it -> "${it.value}" }.joinToString(",")
     }
+
+
 }
 

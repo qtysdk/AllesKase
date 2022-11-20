@@ -25,7 +25,6 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
         givenPlayerWithId(PLAYER_1)
         givenPlayerWithId(PLAYER_2)
 
-
         val gameId = givenGameWithPlayers(PLAYER_1, PLAYER_2)
         givenDemoZoneWithCards_1C_1T_5T_5C_6T_6T(gameId)
 
@@ -70,7 +69,7 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
         var events = gameStatus.events(2)
 
         val demoZone = mockk<DemoZone>()
-        every { demoZone.toCompatCardsExpression() } returns "1C,1T,5T,5C,6T,6T"
+        every { demoZone.toCompatCardsExpression() } returns "1,1,5,5,6,6"
 
         assertEquals(Events.demoZone(demoZone), events[0])
         assertEquals(Events.turnPlayer(PLAYER_1), events[1])
