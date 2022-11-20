@@ -22,11 +22,19 @@ data class TurnOutput(
 )
 
 @Serializable
+data class EventOutput(
+    val type: String,
+    val createdAt: String,
+    val data: String
+)
+
+@Serializable
 data class GameViewOutput(
     val gameId: String,
     val players: List<PlayerOutput>,
     val turn: TurnOutput,
     val demoZone: List<Int>,
     val providingDeck: DeckTopCard,
-    val droppedDeck: DeckTopCard
+    val droppedDeck: DeckTopCard,
+    val events: List<EventOutput>
 )

@@ -1,3 +1,5 @@
+import exp from "constants";
+
 export interface CreateGameResponse {
     gameId: string
     playerId: string
@@ -26,6 +28,12 @@ export interface DeckInfo {
     numberOfCards: number;
 }
 
+export interface EventOutput {
+    type: string;
+    createdAt: string;
+    data: string
+}
+
 export interface GameView {
     gameId: string;
     players: Array<Player>;
@@ -33,4 +41,5 @@ export interface GameView {
     turn: Turn;
     providingDeck: DeckInfo;
     droppedDeck: DeckInfo;
+    events: Array<EventOutput>;
 }

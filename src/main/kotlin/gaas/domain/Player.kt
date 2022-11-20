@@ -1,5 +1,6 @@
 package gaas.domain
 
+import gaas.common.Event
 import gaas.common.PlayerHasBeenDead
 
 enum class PlayerAction {
@@ -8,12 +9,11 @@ enum class PlayerAction {
 
 data class PlayerActions(val actions: List<PlayerAction>, val index: List<Int>)
 
-
 class Player(val id: String) {
     var alive: Boolean = true
 
     val keptCards = mutableListOf<Card>()
-    private val privateMessage = mutableListOf<String>()
+    private val events = mutableListOf<Event>()
 
     fun keepCard(card: Card) {
         if (!alive) {
@@ -35,16 +35,16 @@ class Player(val id: String) {
         }.sumOf { it.value }
     }
 
-    fun privateMessages(): List<String> {
-        return this.privateMessage
+    fun events(): List<Event> {
+        return this.events
     }
 
-    fun addPrivateMessage(message: String) {
-        this.privateMessage.add(message)
+    fun postEvent(event: Event) {
+        this.events.add(event)
     }
 
     override fun toString(): String {
-        return "Player(id='$id', alive=$alive, keptCards=$keptCards, privateMessage=$privateMessage)"
+        return "Player(id='$id', alive=$alive, keptCards=$keptCards, events=$events)"
     }
 
     fun toCompatCardsExpression(): String {

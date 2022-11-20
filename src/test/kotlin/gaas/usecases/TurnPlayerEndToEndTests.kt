@@ -49,7 +49,10 @@ class TurnPlayerEndToEndTests : BaseEndToEndTests() {
     private fun whenTurnPlayerDoActionThenSwitchToTheNextPlayer(gameId: String) {
         playerActionUseCase.doAction(gameId, PLAYER_1, "PEEP", 0)
         // player 1 got the private message for peep the card
-        assertEquals(database.playerMap[PLAYER_1]!!.privateMessages(), listOf("peep, index:0, card: 1C"))
+        assertEquals(
+            database.playerMap[PLAYER_1]!!.events()[0],
+            Events.playerPeepCardInPrivate(PLAYER_1, Card(1, CardType.CHEESE))
+        )
 
         // player changed
         val gameStatus: GameStatus = queryGameStatus.query(gameId)

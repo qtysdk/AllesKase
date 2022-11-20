@@ -8,12 +8,10 @@ import gaas.domain.Game
 import gaas.domain.PlayerAction
 import gaas.repository.Database
 
-
 interface PlayerActionUseCase {
     fun doAction(gameId: String, playerId: String, action: String, cardIndex: Int)
 
 }
-
 
 class PlayerActionUseCaseImpl(val database: Database) : PlayerActionUseCase {
     override fun doAction(gameId: String, playerId: String, action: String, cardIndex: Int) {
@@ -26,16 +24,17 @@ class PlayerActionUseCaseImpl(val database: Database) : PlayerActionUseCase {
         validateActionRequest(game, action)
         validateCardIndex(game, cardIndex)
 
-        val cardAtDemoZone = game.demoZone[cardIndex]!!
+        val cardAtDemoZone = game.demoZone[cardIndex]
 
         if (action == PlayerAction.PEEP.name) {
-            turn.player.addPrivateMessage("peep, index:$cardIndex, card: ${cardAtDemoZone.value}${cardAtDemoZone.type.name[0]}")
+            turn.player.postEvent(Events.playerPeepCardInPrivate(playerId, cardAtDemoZone))
+            game.postEvent(Events.playerPeepCard(playerId, cardIndex))
         }
 
         if (action == PlayerAction.KEEP.name) {
             turn.player.keepCard(cardAtDemoZone)
             game.demoZone.replaceCardAt(cardIndex, game.providingDeck.deal())
-            game.postEvent(Events.playerKeepCard(turn.player.id, cardAtDemoZone))
+            game.postEvent(Events.playerKeepCard(turn.player.id, cardIndex))
         }
 
         if (action == PlayerAction.DROP.name) {
