@@ -3,7 +3,7 @@ import './App.css';
 import {Box, Button, Center, Flex, Input} from "@chakra-ui/react";
 import {CreateGame, JoinGame} from "./Components/BeforeGameIdAvailable";
 import {CreateGameResponse, GameView, Player} from "./Types";
-import {Header} from './Components/Common';
+import {CardDisplay, Header} from './Components/Common';
 import {CreateGameApi, GetGameView, PlayActionApi} from "./Apis/GameApis";
 
 interface CreateOrJoinProps {
@@ -50,6 +50,43 @@ function PlayerZoneComponent(props: PlayerZoneProps) {
     )
 }
 
+function DemoZoneCards(props: { demoZone: Array<number> }) {
+    const {demoZone} = props;
+    return <Flex>
+        {
+            demoZone.map((v) => {
+                return <Box m={1}><CardDisplay value={v}/></Box>
+            })
+        }
+    </Flex>
+}
+
+function DemoAndDecks(props: { gameView: GameView }) {
+    const {gameView} = props
+    return (<Box>
+        <Box p={2} flexDirection="row">
+            <Flex>
+                <Box m={3} backgroundColor="yellow.200" p={5} rounded={15}>
+                    <Box m={1} mt={5} fontWeight={500}>供應牌堆</Box>
+                    <Box>
+                        <CardDisplay value={gameView.providingDeck.value}/>
+                    </Box>
+                </Box>
+                <Box m={3} backgroundColor="lightgray" p={5} rounded={15}>
+                    <Box m={1} mt={5} fontWeight={500}>棄牌堆</Box>
+                    <Box>
+                        <CardDisplay value={gameView.droppedDeck.value}/>
+                    </Box>
+                </Box>
+                <Box m={3} backgroundColor="lightblue" p={5} rounded={15}>
+                    <Box m={1} mt={5} fontWeight={500}>展示區</Box>
+                    <DemoZoneCards demoZone={gameView.demoZone}/>
+                </Box>
+            </Flex>
+        </Box>
+    </Box>)
+}
+
 function GameViewComponent(props: GameViewProps) {
     const {game, gameView} = props;
     if (!gameView) {
@@ -67,7 +104,7 @@ function GameViewComponent(props: GameViewProps) {
         })
     }
 
-    return <Box width="100vw">
+    return <Box width="100vw" style={{paddingTop: "128px"}}>
         <Flex>
             <Box minWidth="300px" padding={5}>
                 <Box>Events</Box>
@@ -79,6 +116,7 @@ function GameViewComponent(props: GameViewProps) {
                 </Box>
             </Box>
             <Box>
+                <DemoAndDecks gameView={gameView}/>
                 <Box>
                     {gameView.players.map(player => {
                         return <PlayerZoneComponent player={player}/>
@@ -86,11 +124,13 @@ function GameViewComponent(props: GameViewProps) {
                 </Box>
 
                 <Box mb={10}>
+
                     <Box>
                         <li>Game Id：{gameView.gameId} </li>
                         <li>展示區：{JSON.stringify(gameView.demoZone)} </li>
                         <li>供應牌資料：{JSON.stringify(gameView.providingDeck)}</li>
                         <li>棄牌堆資料：{JSON.stringify(gameView.droppedDeck)}</li>
+                        <li></li>
                         <li>你的 Player Id：{game.playerId}</li>
                         <li>目前玩家：{gameView.turn.player.playerId}</li>
                         <li>是 Host?：{gameView.players[0].playerId == game.playerId ? 'yes' : 'no'}</li>
