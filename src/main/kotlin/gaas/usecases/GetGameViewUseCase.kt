@@ -2,8 +2,11 @@ package gaas.usecases
 
 import gaas.common.Event
 import gaas.domain.Deck
+import gaas.domain.DemoZone
 import gaas.domain.Game
 import gaas.domain.Player
+import gaas.domain.Turn
+import gaas.ports.CardActions
 import gaas.ports.DeckTopCard
 import gaas.ports.EventOutput
 import gaas.ports.GameViewOutput
@@ -21,6 +24,7 @@ class GetGameViewUseCaseImpl(private val database: Database) : GetGameViewUseCas
     override fun fetch(gameId: String, playerId: String): GameViewOutput {
         val game = database.findGameById(gameId)!!
         val player = database.findPlayerById(playerId)!!
+        val isTurnPlayer = game.turn.player.id == playerId
         return GameViewOutput(
             gameId,
             game.players.map { p ->
@@ -43,12 +47,42 @@ class GetGameViewUseCaseImpl(private val database: Database) : GetGameViewUseCas
                     game.turn.actionList.map { action -> action.name }.toList(),
                     game.turn.actionIndex.toList()
                 )
-            }, game.demoZone.toCardValues(),
+            }, toDemoZoneOutput(isTurnPlayer, game.turn, game.demoZone),
             toDeckTopView(game.providingDeck),
             toDeckTopView(game.droppedDeck),
             toEvents(game, player)
         )
 
+    }
+
+    private fun toDemoZoneOutput(isTurnPlayer: Boolean, turn: Turn, demoZone: DemoZone): List<CardActions> {
+        if (!isTurnPlayer) {
+            return demoZone.toCardValues().mapIndexed { index, value ->
+                CardActions(
+                    index, value, emptyList()
+                )
+            }.toList()
+        }
+
+        // no dice value matched, PEEP only
+        if (!demoZone.toCardValues().contains(turn.diceValue)) {
+            return demoZone.toCardValues().mapIndexed { index, value ->
+                CardActions(
+                    index, value,
+                    turn.actionList.map { action -> action.name }.toList()
+                )
+            }.toList()
+        }
+
+        return demoZone.toCardValues().mapIndexed { index, value ->
+            CardActions(
+                index, value, if (value == turn.diceValue) {
+                    turn.actionList.map { action -> action.name }.toList()
+                } else {
+                    emptyList()
+                }
+            )
+        }.toList()
     }
 
     private fun toEvents(game: Game, player: Player): List<EventOutput> {
@@ -60,7 +94,8 @@ class GetGameViewUseCaseImpl(private val database: Database) : GetGameViewUseCas
             EventOutput(
                 it.type.name,
                 it.createAt.format(DateTimeFormatter.ISO_DATE_TIME),
-                it.data ?: ""
+                it.data ?: "",
+                it.playerId
             )
         }.toList()
     }

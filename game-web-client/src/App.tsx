@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
-import {Box, Button, Center, Flex, Input} from "@chakra-ui/react";
+import {Box, Button, Center, Text, Flex, Input, Spacer} from "@chakra-ui/react";
 import {CreateGame, JoinGame} from "./Components/BeforeGameIdAvailable";
-import {CreateGameResponse, GameView, Player} from "./Types";
+import {CardActions, CreateGameResponse, EventOutput, GameView, Player} from "./Types";
 import {CardDisplay, Header} from './Components/Common';
 import {CreateGameApi, GetGameView, PlayActionApi} from "./Apis/GameApis";
+import * as CSS from "csstype";
+
 
 interface CreateOrJoinProps {
     setGame(game: CreateGameResponse)
@@ -12,7 +14,7 @@ interface CreateOrJoinProps {
 
 function CreateOrJoinComponent(props: CreateOrJoinProps) {
     return (
-        <Flex flexDirection="row">
+        <Flex flexDirection="row" mt="128px">
             <CreateGame onRequestCreateGame={(playerId) => {
                 CreateGameApi(playerId, {
                     onGameCreated(response: CreateGameResponse) {
@@ -34,58 +36,123 @@ interface GameViewProps {
     gameView: GameView
 }
 
-interface PlayerZoneProps {
-    player: Player
-}
+function PlayerZoneComponent(props: { player: Player, turnPlayer: Player }) {
+    const {player, turnPlayer} = props
+    let color = "blue.100"
+    if (player.playerId === turnPlayer.playerId) {
+        color = "red.100"
+    }
 
-function PlayerZoneComponent(props: PlayerZoneProps) {
-    const {player} = props
     return (
-        <Box backgroundColor="red.100" width="99vw" key={player.playerId} mb={5}>
-            <li>玩家ID: {player.playerId} {' '}</li>
-            <li>分數: {player.score}</li>
-            <li>狀態: {player.alive ? '存活' : '淘汰'}</li>
-            <li>持有卡片: {player.keptCards}</li>
+        <Box backgroundColor="gray.100" width="250px" height="150px" key={player.playerId} mb={5} rounded={10}
+             shadow="xl">
+            <Flex>
+                <Box p={2} pl={4} backgroundColor={color}>{player.playerId}</Box>
+                <Spacer backgroundColor={color}></Spacer>
+                <Box p={2} pr={4} backgroundColor={color} roundedTopRight={20} fontWeight={500}># {player.score}</Box>
+            </Flex>
+            <Box p={2}>
+                <Flex>
+                    {player.keptCards.split(",").map(c => {
+                        return <Box m={1}><CardDisplay value={parseInt(c[0])} small={true}
+                                                       sign={c[1]}></CardDisplay></Box>
+                    })}
+                </Flex>
+                <Text mt={2}>狀態: {player.alive ? '存活' : '淘汰'}</Text>
+
+            </Box>
         </Box>
     )
 }
 
-function DemoZoneCards(props: { demoZone: Array<number> }) {
-    const {demoZone} = props;
+function PlayActionButton(props: { index: number, actions: Array<string>, onActionTake: (i: number, a: string) => void }) {
+    const {index, actions, onActionTake} = props;
+    return <>
+        <Flex fontSize="10px" flexDirection="column">
+            {actions.map(action => {
+                return <Center>
+                    <Box m={1} width="40px" rounded={5} style={{cursor: "pointer"}}
+                         backgroundColor="black" color="white"
+                         onClick={(e) => {
+                             onActionTake(index, action)
+                         }
+                         }><Center>{action}</Center></Box>
+                </Center>
+            })}
+        </Flex>
+    </>
+}
+
+function DemoZoneCards(props: { demoZone: Array<CardActions>, isTurnPlayer: boolean, gameView: GameView, onActionTake: (i: number, a: string) => void }) {
+    const {demoZone, gameView, isTurnPlayer, onActionTake} = props;
     return <Flex>
         {
-            demoZone.map((v) => {
-                return <Box m={1}><CardDisplay value={v}/></Box>
+            demoZone.map(cardAction => {
+                return <Flex m={1} flexDirection="column">
+                    <CardDisplay value={cardAction.value}/>
+                    {cardAction.actions &&
+                        <PlayActionButton index={cardAction.index} actions={cardAction.actions}
+                                          onActionTake={onActionTake}/>
+                    }
+                </Flex>
             })
         }
     </Flex>
 }
 
-function DemoAndDecks(props: { gameView: GameView }) {
-    const {gameView} = props
-    return (<Box>
-        <Box p={2} flexDirection="row">
-            <Flex>
-                <Box m={3} backgroundColor="yellow.200" p={5} rounded={15}>
-                    <Box m={1} mt={5} fontWeight={500}>供應牌堆</Box>
-                    <Box>
-                        <CardDisplay value={gameView.providingDeck.value}/>
-                    </Box>
-                </Box>
-                <Box m={3} backgroundColor="lightgray" p={5} rounded={15}>
-                    <Box m={1} mt={5} fontWeight={500}>棄牌堆</Box>
-                    <Box>
-                        <CardDisplay value={gameView.droppedDeck.value}/>
-                    </Box>
-                </Box>
-                <Box m={3} backgroundColor="lightblue" p={5} rounded={15}>
-                    <Box m={1} mt={5} fontWeight={500}>展示區</Box>
-                    <DemoZoneCards demoZone={gameView.demoZone}/>
-                </Box>
-            </Flex>
+function Window(props: {
+    title: React.ReactNode,
+    color: CSS.Property.Color,
+    width?: CSS.Property.Width,
+    height?: CSS.Property.Height
+    children: React.ReactNode
+}) {
+    const {color, title, children} = props
+    const width = props.width == null ? "250px" : props.width
+    const height = props.height == null ? "150px" : props.height
+
+    return <Box backgroundColor="gray.100" width={width} height={height} mb={5} rounded={10}
+                shadow="xl" mr={5}>
+        <Flex>
+            <Box p={2} pl={4} backgroundColor={color}>{title}</Box>
+            <Spacer backgroundColor={color}></Spacer>
+            <Box p={2} pr={4} backgroundColor={color} roundedTopRight={20} fontWeight={500}></Box>
+        </Flex>
+        <Box>
+            {children}
         </Box>
+    </Box>
+}
+
+function DemoAndDecks(props: { game: CreateGameResponse, gameView: GameView }) {
+    const {game, gameView} = props
+    let color = "gray.300"
+    return (<Box flexDirection="row" mt={5}>
+        <Flex>
+            <Window color={color} title={`供應牌堆 (${gameView.providingDeck.numberOfCards})`}>
+                <Box>
+                    <CardDisplay value={gameView.providingDeck.value}/>
+                </Box>
+            </Window>
+            <Window color={color} title={`棄牌堆 (${gameView.droppedDeck.numberOfCards})`}>
+                <Box>
+                    <CardDisplay value={gameView.droppedDeck.value}/>
+                </Box>
+            </Window>
+            <Window color={color} title="展示區" width="500px">
+                <DemoZoneCards demoZone={gameView.demoZone} gameView={gameView}
+                               isTurnPlayer={game.playerId === gameView.turn.player.playerId}
+                               onActionTake={
+                                   (index, action) => {
+                                       PlayActionApi(game.gameId, game.playerId, action, index)
+                                   }
+                               }
+                />
+            </Window>
+        </Flex>
     </Box>)
 }
+
 
 function GameViewComponent(props: GameViewProps) {
     const {game, gameView} = props;
@@ -93,33 +160,75 @@ function GameViewComponent(props: GameViewProps) {
         return <></>
     }
 
-    const turn = gameView.turn;
-    const availabeActions = []
-    if (turn.player.playerId == game.playerId) {
-        // turn.actionList.map(action => {action: action, index3: turn.actionIndex})
-        turn.actionList.forEach(action => {
-            turn.actionIndex.forEach(cardIndex => {
-                availabeActions[availabeActions.length] = {action: action, index: cardIndex}
-            })
+    const eventFilter = (events: Array<EventOutput>) => {
+        return events.filter((input) => {
+            switch (input.type) {
+                case "DEMO_ZONE_CHANGED":
+                    return false
+                case "GAME_CHANGE_TURN_PLAYER":
+                    return false
+                case "PLAYER_DID_KEEP":
+                    return false
+                case "SCORE_LIST_ANNOUNCED":
+                    // 分數列表
+                    return false
+                default:
+                    return true
+            }
+        });
+    }
+
+    const cardInfo = (c: string) => {
+        const type = c[1] === "T" ? "陷阱" : "起司"
+        return `${c[0]}點的${type}`
+    }
+
+    const EventLog = (props: { evt: EventOutput, verb: string, children: React.ReactNode }) => {
+        const {evt, verb, children} = props
+        return <>{evt.playerId} {verb}
+            <Text as="span" backgroundColor="cyan.200" ml="2px">{children}</Text></>
+    }
+
+    const eventTranslate = (events: Array<EventOutput>) => {
+        return events.map(evt => {
+            switch (evt.type) {
+                case "GAME_STARTED":
+                    return "遊戲已經開始囉！"
+                case "GAME_ENDED":
+                    return "遊戲已經結束惹！"
+                case "PLAYER_DID_DROP":
+                    return <EventLog evt={evt} verb="丟棄">位置 {parseInt(evt.data) + 1} 的牌</EventLog>
+                case "PLAYER_PRIVATE_PEEP_DATA":
+                    return <EventLog evt={evt} verb="偷看到">{cardInfo(evt.data)}</EventLog>
+                case "PLAYER_DID_PEEP":
+                    return <EventLog evt={evt} verb="偷看的是">位置 {parseInt(evt.data) + 1} 的牌</EventLog>
+                case "GAME_HAS_WINNER":
+                    return <Text as="span" backgroundColor="yellow">{evt.playerId} 贏辣！！！</Text>
+                case "GAME_CHANGE_TURN_PLAYER":
+                    return <Text as="span" fontSize="8pt">等待 {evt.playerId} 出牌</Text>
+
+            }
+            return JSON.stringify(evt)
         })
     }
 
-    return <Box width="100vw" style={{paddingTop: "128px"}}>
+
+    return <Box width="100vw" style={{paddingTop: "48px"}}>
         <Flex>
             <Box minWidth="300px" padding={5}>
-                <Box>Events</Box>
-                <Box fontSize="8pt" maxHeight="400px" style={{scrollBehavior: "auto"}}>
-                    {!gameView.events && <li>no events</li>}
-                    {gameView.events.map(e => {
-                        return <li><span style={{fontWeight: 300}}>{e.type}</span> {' '} {e.data}</li>
+                <Box>遊戲歷程</Box>
+                <Box fontSize="10pt" maxHeight="400px" style={{scrollBehavior: "auto"}}>
+                    {gameView.events.length == 0 && <li>遊戲還沒有開始喔！</li>}
+                    {eventTranslate(eventFilter(gameView.events)).map(e => {
+                        return <><Box p="2px">* {e}</Box></>
                     })}
                 </Box>
             </Box>
-            <Box>
-                <DemoAndDecks gameView={gameView}/>
+            <Box width="100%">
+                <DemoAndDecks game={game} gameView={gameView}/>
                 <Box>
                     {gameView.players.map(player => {
-                        return <PlayerZoneComponent player={player}/>
+                        return <PlayerZoneComponent player={player} turnPlayer={gameView.turn.player}/>
                     })}
                 </Box>
 
@@ -127,28 +236,9 @@ function GameViewComponent(props: GameViewProps) {
 
                     <Box>
                         <li>Game Id：{gameView.gameId} </li>
-                        <li>展示區：{JSON.stringify(gameView.demoZone)} </li>
-                        <li>供應牌資料：{JSON.stringify(gameView.providingDeck)}</li>
-                        <li>棄牌堆資料：{JSON.stringify(gameView.droppedDeck)}</li>
-                        <li></li>
-                        <li>你的 Player Id：{game.playerId}</li>
-                        <li>目前玩家：{gameView.turn.player.playerId}</li>
-                        <li>是 Host?：{gameView.players[0].playerId == game.playerId ? 'yes' : 'no'}</li>
                         <li>骰子點數：{gameView.turn.diceValue}</li>
-                        <li>可以選擇的動作：{gameView.turn.actionList}</li>
-                        <li>可以選擇的位置：{gameView.turn.actionIndex}</li>
                     </Box>
-                    <Box height={150} backgroundColor="blue.50" p={5}>
-                        {
-                            availabeActions.map(x => {
-                                return <Button colorScheme="facebook" m={1} onClick={(e) => {
-                                    PlayActionApi(game.gameId, game.playerId, x.action, x.index)
-                                }
-                                }>{JSON.stringify(x)}</Button>
-                            })
-                        }
 
-                    </Box>
                 </Box>
 
             </Box>
@@ -186,8 +276,8 @@ function App() {
         if (game == null) {
             return;
         }
-        console.log(`view: ${gameView}`);
-        console.log(gameView);
+        // console.log(`view: ${gameView}`);
+        // console.log(gameView);
     }, [gameView])
 
 
@@ -195,7 +285,6 @@ function App() {
         <>
             <Flex background="gray.50"
                   height="100vh"
-                  justifyContent="center"
                   alignItems="center"
                   flexDirection="column">
                 <Header/>

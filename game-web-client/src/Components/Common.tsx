@@ -8,9 +8,10 @@ import card_5 from './images/5.png'
 import card_6 from './images/6.png'
 import card_0 from './images/baelz.png'
 
-export function CardDisplay(props: { value: number, small?: boolean }) {
-    const {value, small} = props;
+export function CardDisplay(props: { value: number, small?: boolean, sign?: string }) {
+    const {value, small, sign} = props;
     const width = small === true ? "24px" : "48px";
+
     const mapping = {
         0: card_0,
         1: card_1,
@@ -20,7 +21,15 @@ export function CardDisplay(props: { value: number, small?: boolean }) {
         5: card_5,
         6: card_6,
     }
-    return (<Box borderWidth="3px"><img src={mapping[value]} style={{width: width}}/></Box>)
+
+    if (sign === "T") {
+        return (<Box borderWidth="1px"><img src={mapping[value]} style={{width: width, filter: "grayscale(1)"}}/></Box>)
+    } else if (sign === "C") {
+        return (<Box borderWidth="1px"><img src={mapping[value]} style={{width: width}}/></Box>)
+    } else {
+        return (<Box borderWidth="3px"><img src={mapping[value]} style={{width: width}}/></Box>)
+    }
+
 
 }
 
