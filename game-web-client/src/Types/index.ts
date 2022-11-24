@@ -32,12 +32,19 @@ export interface EventOutput {
     type: string;
     createdAt: string;
     data: string
+    playerId?: string
+}
+
+export interface CardActions {
+    index: number;
+    value: number;
+    actions: Array<string>;
 }
 
 export interface GameView {
     gameId: string;
     players: Array<Player>;
-    demoZone: Array<number>;
+    demoZone: Array<CardActions>;
     turn: Turn;
     providingDeck: DeckInfo;
     droppedDeck: DeckInfo;

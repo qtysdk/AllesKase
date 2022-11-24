@@ -3,6 +3,7 @@ body {
     font-weight: 400;
     font-size: 11pt;
     overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 
@@ -19,13 +20,9 @@ a {
     align-items: center;
 }
 
-.TopicContainer {
-    display: flex;
-    text-align: start;
-    margin: 0.5em;
-}
 
 .Header {
+    display: block;
     position: fixed;
     top: 0px;
     left: 0px;
@@ -38,22 +35,3 @@ a {
 }
 
 
-.TopicTitle {
-    min-width: 300px;
-}
-
-.TopicView {
-    min-width: 60px;
-}
-
-.TopicCategory {
-    min-width: 200px;
-}
-
-.TopicAuthor {
-    min-width: 280px;
-}
-
-.TopicContainer:hover {
-    background-color: greenyellow;
-}

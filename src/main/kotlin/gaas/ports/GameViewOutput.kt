@@ -25,15 +25,19 @@ data class TurnOutput(
 data class EventOutput(
     val type: String,
     val createdAt: String,
-    val data: String
+    val data: String,
+    val playerId: String?
 )
+
+@Serializable
+data class CardActions(val index: Int, val value: Int, val actions: List<String>)
 
 @Serializable
 data class GameViewOutput(
     val gameId: String,
     val players: List<PlayerOutput>,
     val turn: TurnOutput,
-    val demoZone: List<Int>,
+    val demoZone: List<CardActions>,
     val providingDeck: DeckTopCard,
     val droppedDeck: DeckTopCard,
     val events: List<EventOutput>
