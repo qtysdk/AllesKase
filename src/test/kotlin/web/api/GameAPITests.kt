@@ -18,6 +18,7 @@ import web.CreateGameRequest
 import web.CreateGameResponse
 import web.JoinGameResponse
 import web.PlayActionRequest
+import web.QueryAvailableGameIdsResponse
 import web.configureAPIs
 import web.configureStatusPages
 import web.initKoinModules
@@ -104,6 +105,17 @@ class GameAPITests {
             setBody(Json.encodeToString(PlayActionRequest(gameView.turn.actionList[0], gameView.turn.actionIndex[0])))
         }
         assertEquals(HttpStatusCode.Accepted, validActionResponse.status)
+    }
+
+    @Test
+    fun testListGameIds() = testApplication {
+        initTestApp()
+
+        val gameIds = listOf(givenCreatedGame(), givenCreatedGame())
+        val queryAvailableGameIdsResponse = Json.decodeFromString<QueryAvailableGameIdsResponse>(
+            client.get("/games").bodyAsText()
+        )
+        assertEquals(gameIds, queryAvailableGameIdsResponse.gameIds)
     }
 
     private suspend fun ApplicationTestBuilder.givenCreatedGame(): String {

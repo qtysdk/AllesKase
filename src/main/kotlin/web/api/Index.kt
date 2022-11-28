@@ -4,6 +4,7 @@ import gaas.usecases.CreateGameUseCase
 import gaas.usecases.GetGameViewUseCase
 import gaas.usecases.JoinGameUseCase
 import gaas.usecases.PlayerActionUseCase
+import gaas.usecases.QueryAvailableGameIds
 import gaas.usecases.StartGameUseCase
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
@@ -26,6 +27,9 @@ import org.koin.ktor.ext.inject
 data class CreateGameRequest(val playerId: String)
 
 @Serializable
+data class QueryAvailableGameIdsResponse(val gameIds: List<String>)
+
+@Serializable
 data class CreateGameResponse(val gameId: String)
 
 @Serializable
@@ -41,6 +45,7 @@ fun Application.configureAPIs() {
     }
 
     val createGameUseCase by inject<CreateGameUseCase>()
+    val queryAvailableGameIds by inject<QueryAvailableGameIds>()
     val getGameViewUseCase by inject<GetGameViewUseCase>()
     val joinGameUseCase by inject<JoinGameUseCase>()
     val startGameUseCase by inject<StartGameUseCase>()
@@ -58,6 +63,11 @@ fun Application.configureAPIs() {
         post("/games") {
             val request = call.receive<CreateGameRequest>()
             call.respond(CreateGameResponse(createGameUseCase.create(request.playerId)))
+        }
+
+        // get available game ids
+        get("/games") {
+            call.respond(QueryAvailableGameIdsResponse(queryAvailableGameIds.query()))
         }
 
         // query game status
