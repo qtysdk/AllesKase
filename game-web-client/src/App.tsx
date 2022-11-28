@@ -4,12 +4,15 @@ import {Box, Button, Center, Text, Flex, Input, Spacer} from "@chakra-ui/react";
 import {CreateGame, JoinGame} from "./Components/BeforeGameIdAvailable";
 import {CardActions, CreateGameResponse, EventOutput, GameView, Player} from "./Types";
 import {CardDisplay, Header} from './Components/Common';
-import {CreateGameApi, GetGameView, PlayActionApi} from "./Apis/GameApis";
+import {CreateGameApi, GetGameView, ListAvailableGameIds, PlayActionApi} from "./Apis/GameApis";
 import * as CSS from "csstype";
 
 
 interface CreateOrJoinProps {
+    // TODO confused parameter => CreateGameResponse
     setGame(game: CreateGameResponse)
+
+    gameIds: Array<string>
 }
 
 function CreateOrJoinComponent(props: CreateOrJoinProps) {
@@ -26,7 +29,7 @@ function CreateOrJoinComponent(props: CreateOrJoinProps) {
             }}/>
 
             <Box width={10}></Box>
-            <JoinGame onGame={props.setGame}/>
+            <JoinGame onGame={props.setGame} gameIds={props.gameIds}/>
         </Flex>
     )
 }
@@ -252,6 +255,7 @@ function App() {
     const [game, setGame] = useState<CreateGameResponse>(null);
     const [gameView, setGameView] = useState<GameView>(null);
     const [refresher, setRefresher] = useState<boolean>(false);
+    const [gameIds, setGameIds] = useState<Array<string>>(null);
 
     const refreshGameView = () => {
         GetGameView(game?.gameId, game?.playerId, {
@@ -276,9 +280,19 @@ function App() {
         if (game == null) {
             return;
         }
-        // console.log(`view: ${gameView}`);
-        // console.log(gameView);
     }, [gameView])
+
+    useEffect(() => {
+        if (game != null) {
+            return;
+        }
+        ListAvailableGameIds({
+            onGameIdsAvailable(response: { gameIds: Array<string> }) {
+                setGameIds(response.gameIds)
+                return
+            }
+        });
+    }, [])
 
 
     return (
@@ -291,7 +305,7 @@ function App() {
 
                 <GameViewComponent game={game} gameView={gameView}/>
                 {gameView == null &&
-                    <CreateOrJoinComponent setGame={setGame}/>
+                    <CreateOrJoinComponent setGame={setGame} gameIds={gameIds}/>
                 }
             </Flex>
         </>

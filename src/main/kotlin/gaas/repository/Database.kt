@@ -6,10 +6,8 @@ import java.util.UUID
 
 class Database {
 
-
     val gameMap = mutableMapOf<String, Game>()
     val playerMap = mutableMapOf<String, Player>()
-
 
     init {
         playerMap["fake-player-1"] = Player("fake-player-1")
@@ -30,5 +28,9 @@ class Database {
 
     fun findGameById(gameId: String): Game? {
         return gameMap[gameId]
+    }
+
+    fun listAvailableGameIds(): List<String> {
+        return gameMap.filter { it.value.isAvailable() }.map { it.key }.toList()
     }
 }

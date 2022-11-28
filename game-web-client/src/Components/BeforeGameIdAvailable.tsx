@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Box, Button, Input} from "@chakra-ui/react";
+import {Box, Button, Input, Select} from "@chakra-ui/react";
 import {JoinGameApi} from "../Apis/GameApis";
 import {CreateGameResponse} from "../Types";
 
@@ -10,18 +10,22 @@ interface CreateGameProps {
 
 export interface JoinGameCallback {
     onGame(game: CreateGameResponse)
+
+    gameIds: Array<string>
 }
 
 export function JoinGame(props: JoinGameCallback) {
     const [gameId, setGameId] = useState<string>(null)
     const [playerId, setPlayerId] = useState<string>(null)
+
     return (<Box background="gray.200" p={10} rounded={10} width={300}>
-        <Input name="gameId" backgroundColor="gray.50" borderColor="gray.400"
-               placeholder="Game Id"
-               onChange={(e) => {
-                   setGameId(e.target.value);
-               }}
-        ></Input>
+        <Select placeholder='Game Id' backgroundColor="gray.50" borderColor="gray.400" onChange={(e) => {
+            setGameId(e.target.value);
+        }}>
+            {props.gameIds?.map((gameId) => {
+                return <option value={gameId}>{gameId}</option>
+            })}
+        </Select>
         <Input mt={1} name="playerId" backgroundColor="gray.50" borderColor="gray.400"
                placeholder="Player Id"
                onChange={(e) => {

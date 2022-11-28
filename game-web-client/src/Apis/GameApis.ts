@@ -17,6 +17,18 @@ export function GetGameView(gameId: string, playerId: string, callback: GetGameV
     }).catch(reason => callback.onError(reason));
 }
 
+export function ListAvailableGameIds(callback: { onGameIdsAvailable(response: { gameIds: Array<string> }) }) {
+    return fetch(`http://localhost:8080/games`, {
+        method: "GET",
+        headers: {
+            "content-type": "application/json"
+        },
+    }).then(data => data.json()).then((response: { gameIds: Array<string> }) => {
+        return callback.onGameIdsAvailable(response)
+    });
+}
+
+
 interface CreateGameCallback {
     onGameCreated(response: CreateGameResponse)
 

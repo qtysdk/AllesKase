@@ -11,6 +11,8 @@ import gaas.usecases.JoinGameUseCase
 import gaas.usecases.JoinGameUseCaseImpl
 import gaas.usecases.PlayerActionUseCase
 import gaas.usecases.PlayerActionUseCaseImpl
+import gaas.usecases.QueryAvailableGameIds
+import gaas.usecases.QueryAvailableGameIdsImpl
 import gaas.usecases.StartGameUseCase
 import gaas.usecases.StartGameUseCaseImpl
 import io.ktor.http.HttpHeaders
@@ -89,6 +91,7 @@ fun KoinApplication.initKoinModules() {
         single<JoinGameUseCase> { JoinGameUseCaseImpl(get()) }
         single<StartGameUseCase> { StartGameUseCaseImpl(get()) }
         single<PlayerActionUseCase> { PlayerActionUseCaseImpl(get()) }
+        single<QueryAvailableGameIds> { QueryAvailableGameIdsImpl(get()) }
     })
 }
 

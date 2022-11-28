@@ -15,7 +15,6 @@ import kotlin.streams.toList
 
 class Game {
 
-
     private val logger: Logger = LoggerFactory.getLogger("Game")
 
     lateinit var id: String
@@ -38,7 +37,6 @@ class Game {
         logger.info("Game[$this] created")
     }
 
-
     fun join(player: Player) {
         // reject players after the game has started
         if (started) {
@@ -56,7 +54,6 @@ class Game {
         }
 
         throw GameRoomHasBeenFull
-
 
         // TODO avoid same player join multiple times
     }
@@ -144,5 +141,8 @@ class Game {
         cardsInitializer.resetCards(this)
     }
 
+    fun isAvailable(): Boolean {
+        return !started && players.size < 6
+    }
 
 }
